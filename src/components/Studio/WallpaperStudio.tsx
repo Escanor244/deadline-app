@@ -5,7 +5,8 @@ import { Deadline, DeviceType, ThemeConfig, TimeRemaining, WidgetSettings } from
 import { ThemeSelector } from './ThemeSelector';
 import { WidgetConfig } from './WidgetConfig';
 import { DeviceMockup } from './DeviceMockup';
-import { Download, Maximize2, Smartphone, Monitor, Eye, Layers, Sparkles } from 'lucide-react';
+import { LiveWallpaperGuide } from './LiveWallpaperGuide';
+import { Download, Maximize2, Smartphone, Monitor, Eye, Layers, Sparkles, RefreshCw } from 'lucide-react';
 
 interface WallpaperStudioProps {
   deadline: Deadline;
@@ -37,6 +38,7 @@ export const WallpaperStudio: React.FC<WallpaperStudioProps> = ({
   onEnterFullscreen,
 }) => {
   const [activeSubTab, setActiveSubTab] = useState<'design' | 'canvas'>('design');
+  const [isGuideOpen, setIsGuideOpen] = useState(false);
 
   const RESOLUTION_LABELS: Record<DeviceType, string> = {
     iphone16: '1179 × 2556 px (iPhone 16 Pro · 19.5:9)',
@@ -60,7 +62,16 @@ export const WallpaperStudio: React.FC<WallpaperStudioProps> = ({
           </p>
         </div>
 
-        <div className="flex items-center space-x-3">
+        <div className="flex flex-wrap items-center gap-2.5">
+          <button
+            onClick={() => setIsGuideOpen(true)}
+            className="flex items-center space-x-1.5 px-3.5 py-2 rounded-xl bg-amber-500/10 hover:bg-amber-500/20 text-amber-300 border border-amber-500/30 text-xs font-medium transition"
+            title="Learn how to make the wallpaper auto-update on iPhone/Android"
+          >
+            <RefreshCw className="w-3.5 h-3.5" />
+            <span>Auto-Update Guide</span>
+          </button>
+
           <button
             onClick={onEnterFullscreen}
             className="flex items-center space-x-1.5 px-3.5 py-2 rounded-xl bg-zinc-900 hover:bg-zinc-800 text-zinc-300 border border-zinc-800 text-xs font-medium transition"
@@ -129,6 +140,14 @@ export const WallpaperStudio: React.FC<WallpaperStudioProps> = ({
           </div>
         </div>
       </div>
+
+      {/* Auto-Updating Wallpaper Modal Guide */}
+      <LiveWallpaperGuide
+        isOpen={isGuideOpen}
+        onClose={() => setIsGuideOpen(false)}
+        deadline={deadline}
+        theme={theme}
+      />
     </div>
   );
 };
