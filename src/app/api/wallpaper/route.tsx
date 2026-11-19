@@ -13,7 +13,10 @@ export async function GET(request: NextRequest) {
   const { searchParams } = new URL(request.url);
 
   const title = searchParams.get('title') || 'High Priority Milestone';
-  const targetDate = searchParams.get('targetDate') || new Date(Date.now() + 7 * 86400000).toISOString();
+  const targetDate =
+    searchParams.get('targetDate') ||
+    searchParams.get('deadline') ||
+    new Date(Date.now() + 7 * 86400000).toISOString();
   const mantra = searchParams.get('mantra') || 'Focus on the finish line.';
   const theme = searchParams.get('theme') || 'obsidian';
 
