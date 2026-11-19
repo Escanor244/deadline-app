@@ -8,7 +8,6 @@ const STORAGE_KEYS = {
   THEME: 'kairos_active_theme',
   DEVICE: 'kairos_selected_device',
   WIDGETS: 'kairos_widget_settings',
-  GEMINI_KEY: 'kairos_gemini_api_key',
 };
 
 export const DEFAULT_WIDGETS: WidgetSettings = {
@@ -145,24 +144,6 @@ export function saveWidgets(widgets: WidgetSettings): void {
   if (typeof window === 'undefined') return;
   try {
     localStorage.setItem(STORAGE_KEYS.WIDGETS, JSON.stringify(widgets));
-  } catch {
-    // Ignore
-  }
-}
-
-export function loadGeminiKey(): string {
-  if (typeof window === 'undefined') return '';
-  try {
-    return localStorage.getItem(STORAGE_KEYS.GEMINI_KEY) || '';
-  } catch {
-    return '';
-  }
-}
-
-export function saveGeminiKey(key: string): void {
-  if (typeof window === 'undefined') return;
-  try {
-    localStorage.setItem(STORAGE_KEYS.GEMINI_KEY, key.trim());
   } catch {
     // Ignore
   }

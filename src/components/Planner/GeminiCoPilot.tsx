@@ -1,10 +1,9 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
-import { Deadline, Milestone } from '@/types';
+import React, { useState } from 'react';
+import { Deadline } from '@/types';
 import { buildGeminiPlanningPrompt } from '@/lib/smartPlanner';
-import { loadGeminiKey, saveGeminiKey } from '@/lib/storage';
-import { Sparkles, Copy, Check, ExternalLink, Key, Cpu, AlertCircle } from 'lucide-react';
+import { Sparkles, Copy, Check, ExternalLink, Cpu, AlertCircle } from 'lucide-react';
 
 interface GeminiCoPilotProps {
   deadline: Deadline;
@@ -13,17 +12,11 @@ interface GeminiCoPilotProps {
 
 export const GeminiCoPilot: React.FC<GeminiCoPilotProps> = ({
   deadline,
-  setDeadline,
 }) => {
   const [copied, setCopied] = useState(false);
-  const [apiKey, setApiKey] = useState('');
   const [isGenerating, setIsGenerating] = useState(false);
   const [apiError, setApiError] = useState<string | null>(null);
   const [aiSuggestions, setAiSuggestions] = useState<string | null>(null);
-
-  useEffect(() => {
-    setApiKey(loadGeminiKey());
-  }, []);
 
   const promptText = buildGeminiPlanningPrompt(deadline);
 
@@ -33,53 +26,36 @@ export const GeminiCoPilot: React.FC<GeminiCoPilotProps> = ({
     setTimeout(() => setCopied(false), 2000);
   };
 
-  const handleSaveKey = (val: string) => {
-    setApiKey(val);
-    saveGeminiKey(val);
-  };
-
-  const handleCallGeminiApi = async () => {
-    if (!apiKey.trim()) {
-      setApiError('Please enter your Google Gemini API key first.');
-      return;
-    }
-
+  const handleCallServerGemini = async () => {
     setIsGenerating(true);
     setApiError(null);
     setAiSuggestions(null);
 
     try {
-      const endpoint = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${apiKey.trim()}`;
-      const response = await fetch(endpoint, {
+      const response = await fetch('/api/ai/plan', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          contents: [
-            {
-              parts: [
-                {
-                  text: `${promptText}\n\nPlease format your response as clear markdown with bulleted milestones and time estimates.`,
-                },
-              ],
-            },
-          ],
-        }),
+        body: JSON.stringify({ prompt: promptText }),
       });
 
+      const data = await response.json();
+
       if (!response.ok) {
-        const errData = await response.json().catch(() => ({}));
-        throw new Error(errData?.error?.message || `API error (${response.status})`);
+        if (data?.configured === false) {
+          throw new Error(
+            'GEMINI_API_KEY is not configured in server environment variables. Use the 1-Click Copy Prompt button below to paste into the Gemini web app directly.'
+          );
+        }
+        throw new Error(data?.error || `API error (${response.status})`);
       }
 
-      const data = await response.json();
-      const textOutput = data?.candidates?.[0]?.content?.parts?.[0]?.text;
-      if (textOutput) {
-        setAiSuggestions(textOutput);
+      if (data?.text) {
+        setAiSuggestions(data.text);
       } else {
-        throw new Error('No suggestions received from Gemini.');
+        throw new Error('No output returned from Gemini.');
       }
     } catch (err: unknown) {
-      setApiError((err as Error).message || 'Failed to connect to Gemini API.');
+      setApiError((err as Error).message || 'Failed to connect to AI planning service.');
     } finally {
       setIsGenerating(false);
     }
@@ -95,7 +71,7 @@ export const GeminiCoPilot: React.FC<GeminiCoPilotProps> = ({
             <span>Google Gemini AI Planning Co-Pilot</span>
           </h3>
           <p className="text-xs text-zinc-400 mt-0.5">
-            Use Gemini to reverse-engineer your milestones and generate lock screen art prompts.
+            Use Gemini to analyze your deadline, work backward into micro-sprints, and suggest lock screen mantras.
           </p>
         </div>
 
@@ -119,11 +95,11 @@ export const GeminiCoPilot: React.FC<GeminiCoPilotProps> = ({
                 1-Click Prompt For Gemini Web
               </span>
               <span className="text-[10px] text-emerald-400 font-mono">
-                100% Free · No API Key Needed
+                100% Free · Universal
               </span>
             </div>
             <p className="text-xs text-zinc-400 mt-1">
-              Copy this tailored multimodal prompt and paste it into Gemini (web or mobile) to generate backward milestones or ask for image references.
+              Copy this tailored reverse-planning prompt and paste it into Gemini (web or mobile) to generate backward milestones and custom wallpaper art ideas.
             </p>
 
             <div className="mt-3 p-3 rounded-lg bg-zinc-950 font-mono text-xs text-zinc-300 border border-zinc-800/80 max-h-36 overflow-y-auto whitespace-pre-wrap select-all">
@@ -143,57 +119,50 @@ export const GeminiCoPilot: React.FC<GeminiCoPilotProps> = ({
             ) : (
               <>
                 <Copy className="w-3.5 h-3.5" />
-                <span>Copy Multimodal Gemini Prompt</span>
+                <span>Copy Tailored Gemini Prompt</span>
               </>
             )}
           </button>
         </div>
 
-        {/* Method 2: Direct Client-Side Gemini API (Optional BYOK) */}
+        {/* Method 2: Server-Side Gemini AI Generation */}
         <div className="p-4 rounded-xl bg-zinc-900/70 border border-zinc-800 flex flex-col justify-between space-y-3">
           <div>
             <div className="flex items-center justify-between">
               <span className="text-xs font-mono font-bold uppercase text-zinc-300 flex items-center space-x-1.5">
-                <Key className="w-3.5 h-3.5 text-amber-400" />
-                <span>Direct In-App Gemini API (BYOK)</span>
+                <Cpu className="w-3.5 h-3.5 text-amber-400" />
+                <span>One-Click Server AI Generation</span>
               </span>
               <span className="text-[10px] text-zinc-500 font-mono">
-                Stored in LocalStorage
+                Server Environment Key
               </span>
             </div>
             <p className="text-xs text-zinc-400 mt-1">
-              Have a Google AI / Gemini API key? Paste it here to query Gemini 1.5 Flash directly from your browser.
+              Calls Gemini 1.5 Flash securely via server environment configuration (<code className="text-zinc-300">GEMINI_API_KEY</code>). Zero client key exposure.
             </p>
 
-            <div className="mt-3 space-y-2">
-              <input
-                type="password"
-                value={apiKey}
-                onChange={(e) => handleSaveKey(e.target.value)}
-                placeholder="AIzaSy... (Client-side only)"
-                className="w-full px-3 py-2 rounded-lg bg-zinc-950 border border-zinc-800 text-xs text-white placeholder-zinc-600 focus:outline-none focus:border-amber-500"
-              />
-              <span className="text-[10px] text-zinc-500 block">
-                Your key never leaves your browser. Zero backend storage.
-              </span>
+            <div className="mt-4 p-3 rounded-lg bg-zinc-950/60 border border-zinc-800/80 text-xs text-zinc-400 space-y-1">
+              <p>• Automatically formats reverse checkpoints</p>
+              <p>• Calculates recommended daily focus blocks</p>
+              <p>• Suggests high-focus motivational mantras</p>
             </div>
 
             {apiError && (
-              <div className="mt-2 p-2 rounded bg-rose-500/10 border border-rose-500/20 text-rose-300 text-xs flex items-center space-x-1.5">
-                <AlertCircle className="w-3.5 h-3.5 flex-shrink-0" />
-                <span className="truncate">{apiError}</span>
+              <div className="mt-3 p-3 rounded-xl bg-amber-500/10 border border-amber-500/20 text-amber-300 text-xs flex items-start space-x-2">
+                <AlertCircle className="w-4 h-4 flex-shrink-0 mt-0.5" />
+                <span className="leading-relaxed">{apiError}</span>
               </div>
             )}
           </div>
 
           <button
-            onClick={handleCallGeminiApi}
-            disabled={isGenerating || !apiKey.trim()}
+            onClick={handleCallServerGemini}
+            disabled={isGenerating}
             className="w-full py-2.5 px-3 rounded-lg bg-amber-500/20 hover:bg-amber-500/30 text-amber-300 text-xs font-medium transition flex items-center justify-center space-x-2 border border-amber-500/40 disabled:opacity-50"
           >
-            <Cpu className="w-3.5 h-3.5" />
+            <Sparkles className="w-3.5 h-3.5" />
             <span>
-              {isGenerating ? 'Querying Gemini...' : 'Generate Plan with Gemini 1.5'}
+              {isGenerating ? 'Analyzing with Gemini...' : 'Generate Plan with Gemini 1.5'}
             </span>
           </button>
         </div>
