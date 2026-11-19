@@ -110,16 +110,20 @@ export const CloudDataManager: React.FC<CloudDataManagerProps> = ({
               : 'bg-zinc-900 border-zinc-800 text-zinc-300'
           }`}
         >
-          {dbStatus.connected ? (
+          {dbStatus.mode === 'mongodb_atlas' ? (
             <Cloud className="w-5 h-5 text-emerald-400 flex-shrink-0 mt-0.5" />
           ) : (
-            <HardDrive className="w-5 h-5 text-cyan-400 flex-shrink-0 mt-0.5" />
+            <HardDrive className="w-5 h-5 text-emerald-400 flex-shrink-0 mt-0.5" />
           )}
 
           <div className="flex-1 min-w-0">
             <div className="flex items-center space-x-2">
               <span className="text-xs font-mono font-bold uppercase tracking-wide">
-                {dbStatus.connected ? '● MongoDB Atlas Connected' : '○ Local Storage Mode (Offline / Zero-Config)'}
+                {dbStatus.mode === 'mongodb_atlas'
+                  ? '● MongoDB Atlas Connected'
+                  : dbStatus.mode === 'json_file'
+                  ? '● Local Repo JSON Database Active'
+                  : '○ Local Storage Mode (Offline / Zero-Config)'}
               </span>
               {dbStatus.database && (
                 <span className="text-[10px] font-mono px-1.5 py-0.5 rounded bg-emerald-500/20 text-emerald-300">
@@ -128,9 +132,11 @@ export const CloudDataManager: React.FC<CloudDataManagerProps> = ({
               )}
             </div>
             <p className="text-xs text-zinc-400 mt-1 leading-relaxed">
-              {dbStatus.connected
+              {dbStatus.mode === 'mongodb_atlas'
                 ? 'Your deadlines auto-sync to MongoDB Atlas cloud. Multi-device persistence is active.'
-                : 'Zero-config mode active. Data persists in browser storage. To connect MongoDB on Vercel, simply set MONGODB_URI in your Vercel project settings.'}
+                : dbStatus.mode === 'json_file'
+                ? 'Your goals are persisted directly in the local repository JSON database (data/deadlines.json) and mirrored in browser storage.'
+                : 'Zero-config mode active. Data persists in browser storage.'}
             </p>
 
             {dbStatus.connected && (
@@ -139,14 +145,12 @@ export const CloudDataManager: React.FC<CloudDataManagerProps> = ({
                 disabled={isSyncing}
                 className="mt-2.5 px-3 py-1 rounded-md bg-emerald-500/20 hover:bg-emerald-500/30 text-emerald-300 text-xs font-medium transition"
               >
-                {isSyncing ? 'Syncing...' : 'Sync Active Deadline Now'}
+                {isSyncing ? 'Syncing...' : 'Sync Now'}
               </button>
             )}
 
             {syncMsg && (
-              <span className="block text-xs font-mono text-emerald-400 mt-2">
-                {syncMsg}
-              </span>
+              <p className="text-xs text-emerald-400 mt-2 font-mono">{syncMsg}</p>
             )}
           </div>
         </div>

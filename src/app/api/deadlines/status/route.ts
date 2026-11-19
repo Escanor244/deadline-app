@@ -5,42 +5,33 @@ export const dynamic = 'force-dynamic';
 
 export async function GET() {
   const configured = isMongoConfigured();
-  if (!configured) {
-    return NextResponse.json({
-      connected: false,
-      configured: false,
-      mode: 'local_storage',
-      message: 'Running in zero-backend mode (LocalStorage + JSON Export). To enable MongoDB cloud sync, add MONGODB_URI environment variable on Vercel.',
-    });
-  }
 
-  try {
-    const db = await getMongoDb();
-    if (!db) {
-      return NextResponse.json({
-        connected: false,
-        configured: true,
-        mode: 'error',
-        message: 'MONGODB_URI is set, but failed to connect to database.',
-      });
+  if (configured) {
+    try {
+      const db = await getMongoDb();
+      if (db) {
+        // Ping test
+        await db.command({ ping: 1 });
+
+        return NextResponse.json({
+          connected: true,
+          configured: true,
+          mode: 'mongodb_atlas',
+          database: db.databaseName,
+          message: 'Connected to MongoDB Atlas cloud database.',
+        });
+      }
+    } catch (error: unknown) {
+      console.warn('MongoDB connection check failed, falling back to local JSON db:', error);
     }
-
-    // Ping test
-    await db.command({ ping: 1 });
-
-    return NextResponse.json({
-      connected: true,
-      configured: true,
-      mode: 'mongodb_atlas',
-      database: db.databaseName,
-      message: 'Connected to MongoDB Atlas cloud database.',
-    });
-  } catch (error: unknown) {
-    return NextResponse.json({
-      connected: false,
-      configured: true,
-      mode: 'error',
-      message: (error as Error).message || 'MongoDB connection failed',
-    });
   }
+
+  // Local repository JSON file database is always available and active
+  return NextResponse.json({
+    connected: true,
+    configured: true,
+    mode: 'json_file',
+    database: 'data/deadlines.json',
+    message: 'Local JSON database active in repo (data/deadlines.json).',
+  });
 }

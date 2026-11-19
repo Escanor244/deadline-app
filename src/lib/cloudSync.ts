@@ -3,7 +3,7 @@ import { Deadline } from '@/types';
 export interface DatabaseStatus {
   connected: boolean;
   configured: boolean;
-  mode: 'mongodb_atlas' | 'local_storage' | 'error';
+  mode: 'mongodb_atlas' | 'local_storage' | 'json_file' | 'error';
   database?: string;
   message: string;
 }
@@ -27,7 +27,35 @@ export async function checkDatabaseStatus(): Promise<DatabaseStatus> {
 }
 
 /**
- * Syncs a deadline to MongoDB cloud (if connected)
+ * Fetches all deadlines stored in the local JSON database / server
+ */
+export async function fetchDeadlinesFromServer(): Promise<Deadline[]> {
+  try {
+    const res = await fetch('/api/deadlines', { cache: 'no-store' });
+    if (!res.ok) return [];
+    const data = await res.json();
+    return Array.isArray(data.deadlines) ? data.deadlines : [];
+  } catch {
+    return [];
+  }
+}
+
+/**
+ * Deletes a deadline from the local JSON database / server
+ */
+export async function deleteDeadlineFromServer(id: string): Promise<boolean> {
+  try {
+    const res = await fetch(`/api/deadlines?id=${encodeURIComponent(id)}`, {
+      method: 'DELETE',
+    });
+    return res.ok;
+  } catch {
+    return false;
+  }
+}
+
+/**
+ * Syncs a deadline to local JSON db / server
  */
 export async function syncDeadlineToCloud(deadline: Deadline): Promise<boolean> {
   try {

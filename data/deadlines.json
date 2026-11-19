@@ -1,0 +1,37 @@
+[
+  {
+    "id": "dl-starter-1",
+    "title": "Production Launch V1",
+    "category": "launch",
+    "targetDate": "2026-12-15T18:00:00.000Z",
+    "createdAt": "2026-11-20T00:00:00.000Z",
+    "description": "Ship production-ready application with zero regressions and complete documentation.",
+    "mantra": "Focus on the finish line.",
+    "milestones": [
+      {
+        "id": "ms-starter-1",
+        "title": "Production Launch V1 Phase 1: Architecture & Data Layer",
+        "dueDate": "2026-11-26T00:00:00.000Z",
+        "completed": true
+      },
+      {
+        "id": "ms-starter-2",
+        "title": "Production Launch V1 Phase 2: Core Feature Implementation",
+        "dueDate": "2026-12-04T00:00:00.000Z",
+        "completed": false
+      },
+      {
+        "id": "ms-starter-3",
+        "title": "Production Launch V1 Phase 3: Quality Audit & Performance",
+        "dueDate": "2026-12-11T00:00:00.000Z",
+        "completed": false
+      },
+      {
+        "id": "ms-starter-4",
+        "title": "Production Launch V1 Phase 4: Final Staging & Deploy",
+        "dueDate": "2026-12-14T00:00:00.000Z",
+        "completed": false
+      }
+    ]
+  }
+]

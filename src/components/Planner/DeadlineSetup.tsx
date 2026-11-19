@@ -73,9 +73,12 @@ export const DeadlineSetup: React.FC<DeadlineSetupProps> = ({
             <h2 className="text-base font-bold text-white">
               Target Deadline Setup
             </h2>
+            <span className="text-[10px] font-mono px-2 py-0.5 rounded bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">
+              Synced with local data/deadlines.json
+            </span>
           </div>
           <p className="text-xs text-zinc-400 mt-0.5">
-            Define your goal and target time. Your reverse milestone schedule and lock screen count down from here.
+            Define your goal details below. Edits auto-save immediately to your local repository database.
           </p>
         </div>
 

@@ -21,6 +21,8 @@ import {
   checkDatabaseStatus,
   decodeDeadlineFromShareUrl,
   syncDeadlineToCloud,
+  fetchDeadlinesFromServer,
+  deleteDeadlineFromServer,
   DatabaseStatus,
 } from '@/lib/cloudSync';
 import { Navbar } from '@/components/Navbar';
@@ -30,6 +32,7 @@ import { FullscreenMode } from '@/components/Studio/FullscreenMode';
 import { DeadlineSetup } from '@/components/Planner/DeadlineSetup';
 import { MilestoneList } from '@/components/Planner/MilestoneList';
 import { GeminiCoPilot } from '@/components/Planner/GeminiCoPilot';
+import { CreateGoalModal } from '@/components/Planner/CreateGoalModal';
 import { CalendarSync } from '@/components/Export/CalendarSync';
 import { CloudDataManager } from '@/components/Storage/CloudDataManager';
 
@@ -44,6 +47,7 @@ export default function Home() {
   const [isFullscreen, setIsFullscreen] = useState(false);
   const [isExporting, setIsExporting] = useState(false);
   const [isCloudModalOpen, setIsCloudModalOpen] = useState(false);
+  const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
   const [dbStatus, setDbStatus] = useState<DatabaseStatus>({
     connected: false,
     configured: false,
@@ -84,6 +88,23 @@ export default function Home() {
     setDeviceTypeState(loadSavedDevice());
     setWidgetsState(loadSavedWidgets());
 
+    // Fetch latest goals from local repo JSON db (data/deadlines.json)
+    fetchDeadlinesFromServer().then((serverList) => {
+      if (serverList && serverList.length > 0) {
+        setAllDeadlines(serverList);
+        saveAllDeadlines(serverList);
+
+        const activeId =
+          typeof window !== 'undefined'
+            ? localStorage.getItem('kairos_active_deadline_id')
+            : null;
+        const matching = serverList.find((d) => d.id === activeId);
+        const resolvedActive = matching || serverList[0];
+        setDeadlineState(resolvedActive);
+        saveActiveDeadline(resolvedActive);
+      }
+    });
+
     // Check database status
     checkDatabaseStatus().then((status) => {
       setDbStatus(status);
@@ -112,14 +133,12 @@ export default function Home() {
     return () => clearInterval(interval);
   }, [deadline.targetDate, deadline.createdAt]);
 
-  // Wrapped State Setters with localStorage persistence & cloud sync
+  // Wrapped State Setters with localStorage persistence & local JSON db sync
   const setDeadline = (newDl: Deadline) => {
     setDeadlineState(newDl);
     saveActiveDeadline(newDl);
     setAllDeadlines(loadAllDeadlines());
-    if (dbStatus.connected) {
-      syncDeadlineToCloud(newDl);
-    }
+    syncDeadlineToCloud(newDl);
   };
 
   const handleSelectDeadline = (id: string) => {
@@ -131,18 +150,19 @@ export default function Home() {
   };
 
   const handleCreateNewDeadline = () => {
-    const fresh = createNewDeadline('New Objective', 'launch', 14);
-    saveActiveDeadline(fresh);
-    const updated = loadAllDeadlines();
-    setAllDeadlines(updated);
-    setDeadlineState(fresh);
+    setIsCreateModalOpen(true);
+  };
+
+  const handleSaveNewGoal = (newGoal: Deadline) => {
+    setDeadlineState(newGoal);
+    saveActiveDeadline(newGoal);
+    setAllDeadlines((prev) => [newGoal, ...prev.filter((d) => d.id !== newGoal.id)]);
+    syncDeadlineToCloud(newGoal);
     setActiveTab('planner');
-    if (dbStatus.connected) {
-      syncDeadlineToCloud(fresh);
-    }
   };
 
   const handleDeleteDeadline = (id: string) => {
+    deleteDeadlineFromServer(id);
     const remaining = deleteDeadline(id);
     setAllDeadlines(remaining);
     setDeadlineState(remaining[0]);
@@ -277,6 +297,13 @@ export default function Home() {
           </div>
         )}
       </main>
+
+      {/* Create New Goal Modal */}
+      <CreateGoalModal
+        isOpen={isCreateModalOpen}
+        onClose={() => setIsCreateModalOpen(false)}
+        onCreate={handleSaveNewGoal}
+      />
 
       {/* Cloud & Data Persistence Modal */}
       <CloudDataManager
