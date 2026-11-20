@@ -48,6 +48,14 @@ export async function renderLockScreenToCanvas(
   // 1. Draw Background
   if (theme.id === 'custom' && theme.customImageUri) {
     await drawCustomImageBg(ctx, width, height, theme);
+  } else if (theme.id === 'citron-mint') {
+    drawCitronMintBg(ctx, width, height);
+  } else if (theme.id === 'sunset-peach') {
+    drawSunsetPeachBg(ctx, width, height);
+  } else if (theme.id === 'nordic-paper') {
+    drawNordicPaperBg(ctx, width, height);
+  } else if (theme.id === 'deep-indigo') {
+    drawDeepIndigoBg(ctx, width, height);
   } else if (theme.id === 'terminal') {
     drawTerminalBg(ctx, width, height, theme);
   } else if (theme.id === 'aura') {
@@ -60,7 +68,7 @@ export async function renderLockScreenToCanvas(
 
   // 2. Add film grain texture if enabled
   if (theme.grain) {
-    applyFilmGrain(ctx, width, height, 0.04);
+    applyFilmGrain(ctx, width, height, 0.035);
   }
 
   // 3. Draw Lock Screen Typography & Widgets
@@ -69,6 +77,67 @@ export async function renderLockScreenToCanvas(
   } else {
     drawMobileLayout(ctx, width, height, deviceType, deadline, theme, widgets, timeRemaining);
   }
+}
+
+/**
+ * Citron Mint Background: Vibrant Lime-to-Cyan grain gradient
+ */
+function drawCitronMintBg(ctx: CanvasRenderingContext2D, width: number, height: number) {
+  const grad = ctx.createLinearGradient(0, 0, width, height);
+  grad.addColorStop(0, '#cff674'); // Bright electric lime
+  grad.addColorStop(0.38, '#9cf1a5'); // Fresh spring mint
+  grad.addColorStop(0.72, '#7bf0d5'); // Soft aqua
+  grad.addColorStop(1, '#6ee7b7');
+  ctx.fillStyle = grad;
+  ctx.fillRect(0, 0, width, height);
+
+  // Subtle luminous aura in top corner
+  const radial = ctx.createRadialGradient(width * 0.15, height * 0.1, 40, width * 0.15, height * 0.1, width * 0.7);
+  radial.addColorStop(0, 'rgba(255, 255, 255, 0.35)');
+  radial.addColorStop(1, 'rgba(255, 255, 255, 0)');
+  ctx.fillStyle = radial;
+  ctx.fillRect(0, 0, width, height);
+}
+
+/**
+ * Sunset Peach Background: Coral, blush peach and golden apricot
+ */
+function drawSunsetPeachBg(ctx: CanvasRenderingContext2D, width: number, height: number) {
+  const grad = ctx.createLinearGradient(0, 0, width * 0.8, height);
+  grad.addColorStop(0, '#fda4af');
+  grad.addColorStop(0.5, '#fcd34d');
+  grad.addColorStop(1, '#f43f5e');
+  ctx.fillStyle = grad;
+  ctx.fillRect(0, 0, width, height);
+}
+
+/**
+ * Nordic Paper Background: Warm ceramic ivory
+ */
+function drawNordicPaperBg(ctx: CanvasRenderingContext2D, width: number, height: number) {
+  const grad = ctx.createLinearGradient(0, 0, 0, height);
+  grad.addColorStop(0, '#f8f6f0');
+  grad.addColorStop(1, '#e9e4d8');
+  ctx.fillStyle = grad;
+  ctx.fillRect(0, 0, width, height);
+}
+
+/**
+ * Tokyo Indigo Background: Deep sapphire to midnight violet
+ */
+function drawDeepIndigoBg(ctx: CanvasRenderingContext2D, width: number, height: number) {
+  const grad = ctx.createLinearGradient(0, 0, width, height);
+  grad.addColorStop(0, '#090d16');
+  grad.addColorStop(0.6, '#1e1b4b');
+  grad.addColorStop(1, '#171131');
+  ctx.fillStyle = grad;
+  ctx.fillRect(0, 0, width, height);
+
+  const radial = ctx.createRadialGradient(width * 0.8, height * 0.2, 50, width * 0.8, height * 0.2, width * 0.8);
+  radial.addColorStop(0, 'rgba(167, 139, 250, 0.25)');
+  radial.addColorStop(1, 'rgba(0, 0, 0, 0)');
+  ctx.fillStyle = radial;
+  ctx.fillRect(0, 0, width, height);
 }
 
 /**
@@ -84,7 +153,6 @@ function drawCustomImageBg(
     const img = new Image();
     img.crossOrigin = 'anonymous';
     img.onload = () => {
-      // Calculate cover fit
       const scale = Math.max(width / img.width, height / img.height);
       const x = (width - img.width * scale) / 2;
       const y = (height - img.height * scale) / 2;
@@ -96,17 +164,13 @@ function drawCustomImageBg(
       ctx.drawImage(img, x, y, img.width * scale, img.height * scale);
       ctx.restore();
 
-      // Dim overlay
       const dim = (theme.imageDim ?? 40) / 100;
       ctx.fillStyle = `rgba(0, 0, 0, ${dim})`;
       ctx.fillRect(0, 0, width, height);
-
       resolve();
     };
     img.onerror = () => {
-      // Fallback
-      ctx.fillStyle = '#09090b';
-      ctx.fillRect(0, 0, width, height);
+      drawObsidianOrZenBg(ctx, width, height, theme);
       resolve();
     };
     img.src = theme.customImageUri || '';
@@ -119,17 +183,12 @@ function drawTerminalBg(
   height: number,
   theme: ThemeConfig
 ) {
-  // Base dark gradient
-  const grad = ctx.createLinearGradient(0, 0, 0, height);
-  grad.addColorStop(0, theme.bgPrimary);
-  grad.addColorStop(1, theme.bgSecondary);
-  ctx.fillStyle = grad;
+  ctx.fillStyle = theme.bgPrimary;
   ctx.fillRect(0, 0, width, height);
 
-  // Subtle grid
-  ctx.strokeStyle = 'rgba(34, 197, 94, 0.05)';
+  ctx.strokeStyle = 'rgba(34, 197, 94, 0.08)';
   ctx.lineWidth = 1;
-  const gridSize = 48;
+  const gridSize = 40;
   for (let x = 0; x < width; x += gridSize) {
     ctx.beginPath();
     ctx.moveTo(x, 0);
@@ -142,12 +201,6 @@ function drawTerminalBg(
     ctx.lineTo(width, y);
     ctx.stroke();
   }
-
-  // CRT scanlines
-  ctx.fillStyle = 'rgba(0, 0, 0, 0.15)';
-  for (let y = 0; y < height; y += 4) {
-    ctx.fillRect(0, y, width, 1.5);
-  }
 }
 
 function drawAuraBg(
@@ -156,23 +209,16 @@ function drawAuraBg(
   height: number,
   theme: ThemeConfig
 ) {
-  // Deep background
-  ctx.fillStyle = theme.bgPrimary;
+  const grad = ctx.createLinearGradient(0, 0, 0, height);
+  grad.addColorStop(0, theme.bgPrimary);
+  grad.addColorStop(1, theme.bgSecondary);
+  ctx.fillStyle = grad;
   ctx.fillRect(0, 0, width, height);
 
-  // Radial aura 1
-  const rad1 = ctx.createRadialGradient(width * 0.5, height * 0.35, 50, width * 0.5, height * 0.35, width * 0.75);
-  rad1.addColorStop(0, 'rgba(139, 92, 246, 0.38)');
-  rad1.addColorStop(0.6, 'rgba(59, 130, 246, 0.15)');
-  rad1.addColorStop(1, 'rgba(13, 7, 28, 0)');
-  ctx.fillStyle = rad1;
-  ctx.fillRect(0, 0, width, height);
-
-  // Radial aura 2
-  const rad2 = ctx.createRadialGradient(width * 0.2, height * 0.7, 30, width * 0.2, height * 0.7, width * 0.6);
-  rad2.addColorStop(0, 'rgba(245, 158, 11, 0.2)');
-  rad2.addColorStop(1, 'rgba(13, 7, 28, 0)');
-  ctx.fillStyle = rad2;
+  const orbGrad = ctx.createRadialGradient(width * 0.7, height * 0.3, 20, width * 0.7, height * 0.3, width * 0.6);
+  orbGrad.addColorStop(0, 'rgba(245, 158, 11, 0.28)');
+  orbGrad.addColorStop(1, 'rgba(245, 158, 11, 0)');
+  ctx.fillStyle = orbGrad;
   ctx.fillRect(0, 0, width, height);
 }
 
@@ -184,25 +230,6 @@ function drawBauhausBg(
 ) {
   ctx.fillStyle = theme.bgPrimary;
   ctx.fillRect(0, 0, width, height);
-
-  // Geometric blocks
-  ctx.fillStyle = 'rgba(239, 68, 68, 0.12)';
-  ctx.beginPath();
-  ctx.arc(width * 0.85, height * 0.25, width * 0.45, 0, Math.PI * 2);
-  ctx.fill();
-
-  ctx.fillStyle = 'rgba(37, 99, 235, 0.08)';
-  ctx.fillRect(0, height * 0.6, width * 0.65, height * 0.3);
-
-  // Architectural hairline accents
-  ctx.strokeStyle = 'rgba(255, 255, 255, 0.08)';
-  ctx.lineWidth = 2;
-  ctx.beginPath();
-  ctx.moveTo(width * 0.1, 0);
-  ctx.lineTo(width * 0.1, height);
-  ctx.moveTo(0, height * 0.4);
-  ctx.lineTo(width, height * 0.4);
-  ctx.stroke();
 }
 
 function drawObsidianOrZenBg(
@@ -216,44 +243,10 @@ function drawObsidianOrZenBg(
   grad.addColorStop(1, theme.bgSecondary);
   ctx.fillStyle = grad;
   ctx.fillRect(0, 0, width, height);
-
-  // Subtle luxury corner reticles
-  const pad = Math.round(width * 0.06);
-  const markLen = 24;
-  ctx.strokeStyle = 'rgba(255, 255, 255, 0.12)';
-  ctx.lineWidth = 1.5;
-
-  // Top-left
-  ctx.beginPath();
-  ctx.moveTo(pad, pad + markLen);
-  ctx.lineTo(pad, pad);
-  ctx.lineTo(pad + markLen, pad);
-  ctx.stroke();
-
-  // Top-right
-  ctx.beginPath();
-  ctx.moveTo(width - pad - markLen, pad);
-  ctx.lineTo(width - pad, pad);
-  ctx.lineTo(width - pad, pad + markLen);
-  ctx.stroke();
-
-  // Bottom-left
-  ctx.beginPath();
-  ctx.moveTo(pad, height - pad - markLen);
-  ctx.lineTo(pad, height - pad);
-  ctx.lineTo(pad + markLen, height - pad);
-  ctx.stroke();
-
-  // Bottom-right
-  ctx.beginPath();
-  ctx.moveTo(width - pad - markLen, height - pad);
-  ctx.lineTo(width - pad, height - pad);
-  ctx.lineTo(width - pad, height - pad - markLen);
-  ctx.stroke();
 }
 
 /**
- * Procedural grain pattern for tactile non-slop texture
+ * Procedural grain pattern for tactile organic texture
  */
 function applyFilmGrain(
   ctx: CanvasRenderingContext2D,
@@ -287,6 +280,7 @@ function applyFilmGrain(
 
 /**
  * Draws Mobile (iPhone / Android) Lock Screen layout
+ * Accurately implements the Morning Briefing Porcelain Glass Card from reference
  */
 function drawMobileLayout(
   ctx: CanvasRenderingContext2D,
@@ -298,187 +292,213 @@ function drawMobileLayout(
   widgets: WidgetSettings,
   timeRemaining: TimeRemaining
 ) {
-  const fontFam =
-    theme.fontFamily === 'mono'
-      ? '"JetBrains Mono", "Courier New", monospace'
-      : theme.fontFamily === 'serif'
-      ? '"Georgia", "Times New Roman", serif'
-      : 'system-ui, -apple-system, "Segoe UI", Roboto, sans-serif';
-  const targetDateObj = new Date(deadline.targetDate);
+  const fontFam = 'system-ui, -apple-system, "SF Pro Display", "Segoe UI", Roboto, sans-serif';
+  const briefing = deadline.briefing || {
+    userName: 'Alex',
+    greetingPrefix: 'Good morning',
+    weather: {
+      temperature: '72°',
+      condition: 'partly cloudy',
+      location: 'Greenpoint, Brooklyn',
+      forecastNote: 'Light rain likely after 6PM, bring an umbrella',
+    },
+    events: [
+      { id: 'ev-1', time: '9:30 AM', title: 'Team standup' },
+      { id: 'ev-2', time: '1:00 PM', title: 'Lunch with Priya' },
+      { id: 'ev-3', time: '4:00 PM', title: 'Dentist (20 min drive)' },
+    ],
+    tasks: [
+      { id: 'tk-1', title: 'Send report', completed: false },
+      { id: 'tk-2', title: 'Renew car registration', completed: false },
+    ],
+  };
 
-  // 1. Top Section (Clock & Date)
-  // In 'wallpaper' mode, we leave the top 30% clean as a safe-zone for the phone's native lock screen clock
+  // 1. Top Section (Clock & Date or Safe Area)
   if (widgets.displayMode === 'standalone_hud' || widgets.showClock) {
-    let topCursorY = height * 0.14;
-
-    // Date banner
-    ctx.fillStyle = theme.subtextColor;
-    ctx.font = `600 ${Math.round(width * 0.038)}px ${fontFam}`;
-    ctx.textAlign = 'center';
-    const dateStr = targetDateObj.toLocaleDateString('en-US', {
-      weekday: 'long',
-      month: 'short',
-      day: 'numeric',
-    }).toUpperCase();
-    ctx.fillText(dateStr, width / 2, topCursorY);
-
-    topCursorY += height * 0.09;
-
-    // Large Time
-    ctx.fillStyle = theme.textColor;
-    ctx.font = `700 ${Math.round(width * 0.22)}px ${fontFam}`;
-    ctx.textAlign = 'center';
+    let topCursorY = height * 0.12;
 
     const now = new Date();
+    const dateStr = now.toLocaleDateString('en-US', {
+      weekday: 'long',
+      month: 'long',
+      day: 'numeric',
+    });
+
+    ctx.fillStyle = theme.isLightCard ? 'rgba(15, 23, 42, 0.75)' : 'rgba(255, 255, 255, 0.75)';
+    ctx.font = `500 ${Math.round(width * 0.042)}px ${fontFam}`;
+    ctx.textAlign = 'center';
+    ctx.fillText(dateStr, width / 2, topCursorY);
+
+    topCursorY += height * 0.085;
+
+    ctx.fillStyle = theme.isLightCard ? '#0f172a' : '#ffffff';
+    ctx.font = `700 ${Math.round(width * 0.22)}px ${fontFam}`;
+    ctx.textAlign = 'center';
     const timeStr = now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', hour12: false });
     ctx.fillText(timeStr, width / 2, topCursorY);
-  } else {
-    // Wallpaper Safe-zone indicator (subtle hairline marker)
-    ctx.strokeStyle = 'rgba(255, 255, 255, 0.08)';
-    ctx.setLineDash([6, 6]);
-    ctx.lineWidth = 1;
-    ctx.beginPath();
-    ctx.moveTo(width * 0.2, height * 0.28);
-    ctx.lineTo(width * 0.8, height * 0.28);
-    ctx.stroke();
-    ctx.setLineDash([]);
   }
 
-  // 2. Countdown Display Positioning
-  let cursorY = widgets.verticalPosition === 'lower_third' ? height * 0.48 : height * 0.35;
-
-  // Countdown Card
-  const cardMargin = width * 0.08;
+  // 2. Porcelain Glass Card
+  const cardMargin = width * 0.055;
   const cardWidth = width - cardMargin * 2;
-  const cardHeight = height * 0.25;
+  const cardX = cardMargin;
+  const cardY = widgets.displayMode === 'standalone_hud' ? height * 0.32 : height * 0.26;
+  const cardHeight = height * 0.52;
+  const innerPad = Math.round(width * 0.075);
 
-  // Frosted Card Background
+  ctx.save();
+  // Soft drop shadow
+  ctx.shadowColor = 'rgba(0, 0, 0, 0.14)';
+  ctx.shadowBlur = Math.round(width * 0.05);
+  ctx.shadowOffsetY = Math.round(height * 0.015);
+
+  // Fill porcelain card
   ctx.fillStyle = theme.cardBg;
-  roundRect(ctx, cardMargin, cursorY, cardWidth, cardHeight, 32);
+  roundRect(ctx, cardX, cardY, cardWidth, cardHeight, Math.round(width * 0.08));
   ctx.fill();
+  ctx.restore();
 
+  // Card hairline border
+  ctx.save();
   ctx.strokeStyle = theme.cardBorder;
-  ctx.lineWidth = 2;
-  roundRect(ctx, cardMargin, cursorY, cardWidth, cardHeight, 32);
+  ctx.lineWidth = 1.5;
+  roundRect(ctx, cardX, cardY, cardWidth, cardHeight, Math.round(width * 0.08));
   ctx.stroke();
+  ctx.restore();
 
-  // Card Header: Category & Deadline
-  ctx.fillStyle = theme.accentColor;
-  ctx.font = `700 ${Math.round(width * 0.032)}px ${fontFam}`;
+  // Content coordinates
+  let curY = cardY + innerPad * 1.1;
+
+  // A. Date subheader (e.g., "Wednesday, September 9")
+  const todayDateStr = new Date().toLocaleDateString('en-US', {
+    weekday: 'long',
+    month: 'long',
+    day: 'numeric',
+  });
+  ctx.fillStyle = theme.isLightCard ? '#64748b' : theme.subtextColor;
+  ctx.font = `500 ${Math.round(width * 0.034)}px ${fontFam}`;
   ctx.textAlign = 'left';
-  const categoryHeader = `// TARGET DEADLINE · ${deadline.category.toUpperCase()}`;
-  ctx.fillText(categoryHeader, cardMargin + 36, cursorY + 48);
+  ctx.fillText(todayDateStr, cardX + innerPad, curY);
 
-  // Project Title
-  ctx.fillStyle = theme.textColor;
-  ctx.font = `700 ${Math.round(width * 0.052)}px ${fontFam}`;
-  const truncatedTitle = deadline.title.length > 28 ? deadline.title.slice(0, 26) + '...' : deadline.title;
-  ctx.fillText(truncatedTitle, cardMargin + 36, cursorY + 98);
+  curY += Math.round(width * 0.085);
 
-  // Countdown display based on format
-  const countY = cursorY + 160;
+  // B. Large Personal Greeting (e.g. "Good morning, Alex")
+  const greetingText = `${briefing.greetingPrefix || 'Good morning'}, ${briefing.userName || 'Alex'}`;
+  ctx.fillStyle = theme.isLightCard ? '#0f172a' : theme.textColor;
+  ctx.font = `700 ${Math.round(width * 0.068)}px ${fontFam}`;
+  ctx.fillText(greetingText, cardX + innerPad, curY);
 
-  if (widgets.countdownFormat === 'days_only') {
-    ctx.fillStyle = theme.textColor;
-    ctx.font = `700 ${Math.round(width * 0.16)}px ${fontFam}`;
-    ctx.textAlign = 'center';
-    ctx.fillText(String(timeRemaining.days), cardMargin + cardWidth / 2, countY + 45);
+  curY += Math.round(width * 0.08);
 
-    ctx.fillStyle = theme.subtextColor;
-    ctx.font = `600 ${Math.round(width * 0.03)}px ${fontFam}`;
-    ctx.fillText('DAYS REMAINING TO TARGET', cardMargin + cardWidth / 2, countY + 85);
-  } else if (widgets.countdownFormat === 'compact') {
-    const compactText = `${String(timeRemaining.days).padStart(2, '0')}d : ${String(timeRemaining.hours).padStart(2, '0')}h : ${String(timeRemaining.minutes).padStart(2, '0')}m : ${String(timeRemaining.seconds).padStart(2, '0')}s`;
-    ctx.fillStyle = theme.textColor;
-    ctx.font = `700 ${Math.round(width * 0.065)}px ${fontFam}`;
-    ctx.textAlign = 'center';
-    ctx.fillText(compactText, cardMargin + cardWidth / 2, countY + 55);
-  } else {
-    // Standard DHMS 4-column
-    const numCols = 4;
-    const colWidth = (cardWidth - 72) / numCols;
-    const units = [
-      { label: 'DAYS', val: String(timeRemaining.days).padStart(2, '0') },
-      { label: 'HOURS', val: String(timeRemaining.hours).padStart(2, '0') },
-      { label: 'MINUTES', val: String(timeRemaining.minutes).padStart(2, '0') },
-      { label: 'SECONDS', val: String(timeRemaining.seconds).padStart(2, '0') },
-    ];
+  // C. Weather & Morning Context
+  if (widgets.showWeather !== false) {
+    const weatherText = `☁  ${briefing.weather.temperature}, ${briefing.weather.condition} ${briefing.weather.location}`;
+    ctx.fillStyle = theme.isLightCard ? '#1e293b' : theme.textColor;
+    ctx.font = `600 ${Math.round(width * 0.035)}px ${fontFam}`;
+    ctx.fillText(weatherText, cardX + innerPad, curY);
 
-    units.forEach((u, i) => {
-      const colX = cardMargin + 36 + i * colWidth + colWidth / 2;
+    curY += Math.round(width * 0.048);
 
-      // Number
-      ctx.fillStyle = theme.textColor;
-      ctx.font = `700 ${Math.round(width * 0.085)}px ${fontFam}`;
-      ctx.textAlign = 'center';
-      ctx.fillText(u.val, colX, countY + 45);
-
-      // Label
-      ctx.fillStyle = theme.subtextColor;
-      ctx.font = `600 ${Math.round(width * 0.024)}px ${fontFam}`;
-      ctx.fillText(u.label, colX, countY + 80);
-    });
-  }
-
-  // Timeline Progress Bar at bottom of card
-  if (widgets.showProgressRing) {
-    const barY = cursorY + cardHeight - 24;
-    const barW = cardWidth - 72;
-    const barX = cardMargin + 36;
-
-    ctx.fillStyle = 'rgba(255, 255, 255, 0.12)';
-    roundRect(ctx, barX, barY, barW, 8, 4);
-    ctx.fill();
-
-    const progressRatio = Math.max(0.04, Math.min(1, timeRemaining.formattedPercentage / 100));
-    ctx.fillStyle = theme.accentColor;
-    roundRect(ctx, barX, barY, barW * progressRatio, 8, 4);
-    ctx.fill();
-  }
-
-  // 3. Lower Section: Active Milestone Ticker
-  cursorY = height * 0.67;
-
-  if (widgets.showMilestone) {
-    const nextMilestone = deadline.milestones.find((m) => !m.completed) || deadline.milestones[0];
-    if (nextMilestone) {
-      const msHeight = height * 0.12;
-
-      ctx.fillStyle = theme.cardBg;
-      roundRect(ctx, cardMargin, cursorY, cardWidth, msHeight, 24);
-      ctx.fill();
-
-      ctx.strokeStyle = theme.cardBorder;
-      ctx.lineWidth = 1.5;
-      roundRect(ctx, cardMargin, cursorY, cardWidth, msHeight, 24);
-      ctx.stroke();
-
-      // Badge
-      ctx.fillStyle = theme.accentColor;
-      ctx.font = `700 ${Math.round(width * 0.028)}px ${fontFam}`;
-      ctx.textAlign = 'left';
-      ctx.fillText(`NEXT MILESTONE [${nextMilestone.pacingLabel}]`, cardMargin + 32, cursorY + 44);
-
-      // Milestone Title
-      ctx.fillStyle = theme.textColor;
-      ctx.font = `600 ${Math.round(width * 0.038)}px ${fontFam}`;
-      const msTitle = nextMilestone.title.length > 34 ? nextMilestone.title.slice(0, 32) + '...' : nextMilestone.title;
-      ctx.fillText(msTitle, cardMargin + 32, cursorY + 88);
+    if (briefing.weather.forecastNote) {
+      ctx.fillStyle = theme.isLightCard ? '#64748b' : theme.subtextColor;
+      ctx.font = `400 ${Math.round(width * 0.031)}px ${fontFam}`;
+      ctx.fillText(briefing.weather.forecastNote, cardX + innerPad, curY);
+      curY += Math.round(width * 0.06);
     }
   }
 
-  // 4. Bottom Anchor: Motivational Mantra
-  if (widgets.showMantra && deadline.mantra) {
-    const bottomY = height * 0.88;
-    ctx.fillStyle = theme.subtextColor;
-    ctx.font = `italic 500 ${Math.round(width * 0.034)}px ${fontFam}`;
-    ctx.textAlign = 'center';
-    ctx.fillText(`"${deadline.mantra}"`, width / 2, bottomY);
+  // Divider Line
+  ctx.strokeStyle = theme.isLightCard ? 'rgba(0, 0, 0, 0.07)' : 'rgba(255, 255, 255, 0.12)';
+  ctx.lineWidth = 1;
+  ctx.beginPath();
+  ctx.moveTo(cardX + innerPad, curY);
+  ctx.lineTo(cardX + cardWidth - innerPad, curY);
+  ctx.stroke();
+
+  curY += Math.round(width * 0.06);
+
+  // D. Dual Column Life Grid: Events Today & Tasks Due Today
+  const colWidth = (cardWidth - innerPad * 2) / 2;
+  const col1X = cardX + innerPad;
+  const col2X = cardX + innerPad + colWidth + Math.round(width * 0.02);
+
+  // Column 1 Header: Events
+  const eventsCount = briefing.events.length;
+  ctx.fillStyle = theme.isLightCard ? '#0f172a' : theme.textColor;
+  ctx.font = `600 ${Math.round(width * 0.034)}px ${fontFam}`;
+  ctx.fillText(`🗓  ${eventsCount} events today`, col1X, curY);
+
+  // Column 2 Header: Tasks
+  const tasksCount = briefing.tasks.length;
+  ctx.fillText(`📋  ${tasksCount} tasks due today`, col2X, curY);
+
+  curY += Math.round(width * 0.055);
+
+  // List Rows (up to 3 items per column)
+  const maxRows = Math.max(briefing.events.length, briefing.tasks.length, 3);
+  const rowHeight = Math.round(width * 0.055);
+
+  for (let r = 0; r < Math.min(maxRows, 3); r++) {
+    const rowY = curY + r * rowHeight;
+
+    // Event Row
+    if (briefing.events[r]) {
+      const ev = briefing.events[r];
+      ctx.fillStyle = theme.isLightCard ? '#334155' : theme.textColor;
+      ctx.font = `500 ${Math.round(width * 0.03)}px ${fontFam}`;
+      const evText = `${ev.time} — ${ev.title}`;
+      const truncaEv = evText.length > 22 ? evText.slice(0, 20) + '...' : evText;
+      ctx.fillText(truncaEv, col1X, rowY);
+    }
+
+    // Task Row
+    if (briefing.tasks[r]) {
+      const tk = briefing.tasks[r];
+      ctx.fillStyle = theme.isLightCard ? '#334155' : theme.textColor;
+      ctx.font = `500 ${Math.round(width * 0.03)}px ${fontFam}`;
+      const tkText = tk.title;
+      const truncaTk = tkText.length > 22 ? tkText.slice(0, 20) + '...' : tkText;
+      ctx.fillText(truncaTk, col2X, rowY);
+    }
   }
+
+  // E. Integrated Target Deadline & Countdown Progress Bar (at bottom of card)
+  const footerY = cardY + cardHeight - Math.round(width * 0.14);
+
+  // Divider Line
+  ctx.strokeStyle = theme.isLightCard ? 'rgba(0, 0, 0, 0.07)' : 'rgba(255, 255, 255, 0.12)';
+  ctx.beginPath();
+  ctx.moveTo(cardX + innerPad, footerY - Math.round(width * 0.05));
+  ctx.lineTo(cardX + cardWidth - innerPad, footerY - Math.round(width * 0.05));
+  ctx.stroke();
+
+  // Target Goal Title & Days remaining
+  ctx.fillStyle = theme.accentColor;
+  ctx.font = `700 ${Math.round(width * 0.032)}px ${fontFam}`;
+  ctx.fillText(`🎯 TARGET: ${deadline.title.toUpperCase()}`, cardX + innerPad, footerY);
+
+  ctx.textAlign = 'right';
+  ctx.fillStyle = theme.isLightCard ? '#0f172a' : theme.textColor;
+  ctx.font = `700 ${Math.round(width * 0.034)}px ${fontFam}`;
+  ctx.fillText(`${timeRemaining.days}d ${timeRemaining.hours}h left`, cardX + cardWidth - innerPad, footerY);
+
+  // Pacing Progress Bar
+  const barY = footerY + Math.round(width * 0.03);
+  const barW = cardWidth - innerPad * 2;
+  const barH = Math.round(width * 0.018);
+
+  ctx.fillStyle = theme.isLightCard ? 'rgba(0, 0, 0, 0.08)' : 'rgba(255, 255, 255, 0.12)';
+  roundRect(ctx, cardX + innerPad, barY, barW, barH, barH / 2);
+  ctx.fill();
+
+  const fillW = Math.max(barH, (barW * timeRemaining.formattedPercentage) / 100);
+  ctx.fillStyle = theme.accentColor;
+  roundRect(ctx, cardX + innerPad, barY, fillW, barH, barH / 2);
+  ctx.fill();
 }
 
 /**
- * Draws Desktop / Widescreen Monitor Lock Screen layout
+ * Draws Desktop / Widescreen Layout
  */
 function drawDesktopLayout(
   ctx: CanvasRenderingContext2D,
@@ -489,90 +509,124 @@ function drawDesktopLayout(
   widgets: WidgetSettings,
   timeRemaining: TimeRemaining
 ) {
-  const fontFam =
-    theme.fontFamily === 'mono'
-      ? '"JetBrains Mono", "Courier New", monospace'
-      : theme.fontFamily === 'serif'
-      ? '"Georgia", "Times New Roman", serif'
-      : 'system-ui, -apple-system, "Segoe UI", Roboto, sans-serif';
+  const fontFam = 'system-ui, -apple-system, sans-serif';
+  const briefing = deadline.briefing || {
+    userName: 'Alex',
+    greetingPrefix: 'Good morning',
+    weather: {
+      temperature: '72°',
+      condition: 'partly cloudy',
+      location: 'Greenpoint, Brooklyn',
+      forecastNote: 'Light rain likely after 6PM',
+    },
+    events: [
+      { id: 'ev-1', time: '9:30 AM', title: 'Team standup' },
+      { id: 'ev-2', time: '1:00 PM', title: 'Lunch with Priya' },
+    ],
+    tasks: [
+      { id: 'tk-1', title: 'Send report', completed: false },
+      { id: 'tk-2', title: 'Renew car registration', completed: false },
+    ],
+  };
 
-  // Desktop Header
-  ctx.fillStyle = theme.subtextColor;
-  ctx.font = `600 ${Math.round(height * 0.026)}px ${fontFam}`;
-  ctx.textAlign = 'left';
-  ctx.fillText('// CHRONOLOCK STUDIO · WORKSPACE DEADLINE HUD', width * 0.08, height * 0.12);
+  const cardWidth = Math.round(width * 0.45);
+  const cardHeight = Math.round(height * 0.58);
+  const cardX = (width - cardWidth) / 2;
+  const cardY = (height - cardHeight) / 2;
+  const pad = Math.round(width * 0.03);
 
-  // Big Clock on Desktop
-  const now = new Date();
-  const timeStr = now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
-  ctx.fillStyle = theme.textColor;
-  ctx.font = `700 ${Math.round(height * 0.12)}px ${fontFam}`;
-  ctx.fillText(timeStr, width * 0.08, height * 0.26);
-
-  // Center Hero Countdown Card
-  const cardX = width * 0.08;
-  const cardY = height * 0.35;
-  const cardW = width * 0.84;
-  const cardH = height * 0.42;
-
+  // Shadow
+  ctx.save();
+  ctx.shadowColor = 'rgba(0, 0, 0, 0.12)';
+  ctx.shadowBlur = 40;
+  ctx.shadowOffsetY = 15;
   ctx.fillStyle = theme.cardBg;
-  roundRect(ctx, cardX, cardY, cardW, cardH, 28);
+  roundRect(ctx, cardX, cardY, cardWidth, cardHeight, 36);
   ctx.fill();
+  ctx.restore();
 
+  // Border
   ctx.strokeStyle = theme.cardBorder;
-  ctx.lineWidth = 2;
-  roundRect(ctx, cardX, cardY, cardW, cardH, 28);
+  ctx.lineWidth = 1.5;
+  roundRect(ctx, cardX, cardY, cardWidth, cardHeight, 36);
   ctx.stroke();
 
-  // Project Header Inside Card
-  ctx.fillStyle = theme.accentColor;
-  ctx.font = `700 ${Math.round(height * 0.024)}px ${fontFam}`;
-  ctx.fillText(`COUNTDOWN TO TARGET · ${deadline.category.toUpperCase()}`, cardX + 48, cardY + 56);
+  let curY = cardY + pad * 1.2;
 
-  ctx.fillStyle = theme.textColor;
-  ctx.font = `700 ${Math.round(height * 0.048)}px ${fontFam}`;
-  ctx.fillText(deadline.title, cardX + 48, cardY + 110);
-
-  // 4 Big Columns
-  const countY = cardY + 160;
-  const colW = (cardW - 96) / 4;
-  const units = [
-    { label: 'DAYS REMAINING', val: String(timeRemaining.days).padStart(2, '0') },
-    { label: 'HOURS', val: String(timeRemaining.hours).padStart(2, '0') },
-    { label: 'MINUTES', val: String(timeRemaining.minutes).padStart(2, '0') },
-    { label: 'SECONDS', val: String(timeRemaining.seconds).padStart(2, '0') },
-  ];
-
-  units.forEach((u, i) => {
-    const colCenterX = cardX + 48 + i * colW + colW / 2;
-
-    ctx.fillStyle = theme.textColor;
-    ctx.font = `700 ${Math.round(height * 0.11)}px ${fontFam}`;
-    ctx.textAlign = 'center';
-    ctx.fillText(u.val, colCenterX, countY + 70);
-
-    ctx.fillStyle = theme.subtextColor;
-    ctx.font = `600 ${Math.round(height * 0.02)}px ${fontFam}`;
-    ctx.fillText(u.label, colCenterX, countY + 110);
+  // Date
+  const dateStr = new Date().toLocaleDateString('en-US', {
+    weekday: 'long',
+    month: 'long',
+    day: 'numeric',
   });
-
-  // Footer Milestone & Mantra
+  ctx.fillStyle = theme.isLightCard ? '#64748b' : theme.subtextColor;
+  ctx.font = `500 ${Math.round(height * 0.024)}px ${fontFam}`;
   ctx.textAlign = 'left';
-  if (widgets.showMilestone) {
-    const nextMilestone = deadline.milestones.find((m) => !m.completed) || deadline.milestones[0];
-    if (nextMilestone) {
-      ctx.fillStyle = theme.accentColor;
-      ctx.font = `700 ${Math.round(height * 0.022)}px ${fontFam}`;
-      ctx.fillText(`CURRENT SPRINT: ${nextMilestone.title} [${nextMilestone.pacingLabel}]`, width * 0.08, height * 0.86);
+  ctx.fillText(dateStr, cardX + pad, curY);
+
+  curY += Math.round(height * 0.05);
+
+  // Greeting
+  ctx.fillStyle = theme.isLightCard ? '#0f172a' : theme.textColor;
+  ctx.font = `700 ${Math.round(height * 0.046)}px ${fontFam}`;
+  ctx.fillText(`${briefing.greetingPrefix || 'Good morning'}, ${briefing.userName || 'Alex'}`, cardX + pad, curY);
+
+  curY += Math.round(height * 0.05);
+
+  // Weather
+  ctx.fillStyle = theme.isLightCard ? '#334155' : theme.textColor;
+  ctx.font = `500 ${Math.round(height * 0.022)}px ${fontFam}`;
+  ctx.fillText(`☁  ${briefing.weather.temperature}, ${briefing.weather.condition} • ${briefing.weather.location}`, cardX + pad, curY);
+
+  curY += Math.round(height * 0.04);
+
+  // Divider
+  ctx.strokeStyle = theme.isLightCard ? 'rgba(0, 0, 0, 0.08)' : 'rgba(255, 255, 255, 0.12)';
+  ctx.lineWidth = 1;
+  ctx.beginPath();
+  ctx.moveTo(cardX + pad, curY);
+  ctx.lineTo(cardX + cardWidth - pad, curY);
+  ctx.stroke();
+
+  curY += Math.round(height * 0.045);
+
+  // Dual Column
+  const colW = (cardWidth - pad * 2) / 2;
+  ctx.font = `600 ${Math.round(height * 0.022)}px ${fontFam}`;
+  ctx.fillStyle = theme.isLightCard ? '#0f172a' : theme.textColor;
+  ctx.fillText(`🗓  ${briefing.events.length} events today`, cardX + pad, curY);
+  ctx.fillText(`📋  ${briefing.tasks.length} tasks due today`, cardX + pad + colW, curY);
+
+  curY += Math.round(height * 0.04);
+
+  for (let r = 0; r < 2; r++) {
+    const rowY = curY + r * Math.round(height * 0.035);
+    ctx.font = `400 ${Math.round(height * 0.019)}px ${fontFam}`;
+    ctx.fillStyle = theme.isLightCard ? '#475569' : theme.textColor;
+
+    if (briefing.events[r]) {
+      ctx.fillText(`${briefing.events[r].time} — ${briefing.events[r].title}`, cardX + pad, rowY);
+    }
+    if (briefing.tasks[r]) {
+      ctx.fillText(briefing.tasks[r].title, cardX + pad + colW, rowY);
     }
   }
 
-  if (widgets.showMantra && deadline.mantra) {
-    ctx.fillStyle = theme.subtextColor;
-    ctx.font = `italic 500 ${Math.round(height * 0.024)}px ${fontFam}`;
-    ctx.textAlign = 'right';
-    ctx.fillText(`"${deadline.mantra}"`, width * 0.92, height * 0.86);
-  }
+  // Footer Target
+  const footerY = cardY + cardHeight - Math.round(height * 0.08);
+  ctx.strokeStyle = theme.isLightCard ? 'rgba(0, 0, 0, 0.08)' : 'rgba(255, 255, 255, 0.12)';
+  ctx.beginPath();
+  ctx.moveTo(cardX + pad, footerY - Math.round(height * 0.03));
+  ctx.lineTo(cardX + cardWidth - pad, footerY - Math.round(height * 0.03));
+  ctx.stroke();
+
+  ctx.fillStyle = theme.accentColor;
+  ctx.font = `700 ${Math.round(height * 0.024)}px ${fontFam}`;
+  ctx.fillText(`🎯 TARGET: ${deadline.title.toUpperCase()}`, cardX + pad, footerY);
+
+  ctx.textAlign = 'right';
+  ctx.fillStyle = theme.isLightCard ? '#0f172a' : theme.textColor;
+  ctx.fillText(`${timeRemaining.days}d ${timeRemaining.hours}h left`, cardX + cardWidth - pad, footerY);
 }
 
 /**
@@ -592,6 +646,7 @@ function roundRect(
   ctx.moveTo(x + r, y);
   ctx.arcTo(x + w, y, x + w, y + h, r);
   ctx.arcTo(x + w, y + h, x, y + h, r);
+  ctx.arcTo(x, y + h, x, y, r);
   ctx.arcTo(x, y + h, x, y, r);
   ctx.arcTo(x, y, x + w, y, r);
   ctx.closePath();

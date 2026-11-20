@@ -2,84 +2,91 @@ import { ThemeConfig } from '@/types';
 
 export const THEME_PRESETS: ThemeConfig[] = [
   {
+    id: 'citron-mint',
+    name: 'Citron Mint Glass',
+    tagline: 'Vibrant lime-to-cyan dither gradient with porcelain frosted glass card.',
+    bgType: 'gradient',
+    bgPrimary: '#d2f871', // Vibrant electric lime / chartreuse
+    bgSecondary: '#86efac', // Soft spring mint
+    bgTertiary: '#67e8f9', // Cyan seafoam
+    accentColor: '#15803d', // Forest emerald accent
+    textColor: '#0f172a', // Deep slate for sharp contrast on porcelain
+    subtextColor: '#475569', // Slate-600
+    cardBg: 'rgba(255, 255, 255, 0.88)',
+    cardBorder: 'rgba(255, 255, 255, 0.75)',
+    fontFamily: 'sans',
+    grain: true,
+    isLightCard: true,
+  },
+  {
+    id: 'nordic-paper',
+    name: 'Nordic Paper',
+    tagline: 'Warm ceramic ivory with crisp Swiss typography and subtle paper grain.',
+    bgType: 'solid',
+    bgPrimary: '#f5f3ec',
+    bgSecondary: '#e6e2d6',
+    accentColor: '#c2410c', // Warm terracotta
+    textColor: '#18181b', // Zinc-900
+    subtextColor: '#52525b', // Zinc-600
+    cardBg: 'rgba(255, 255, 255, 0.95)',
+    cardBorder: 'rgba(0, 0, 0, 0.08)',
+    fontFamily: 'sans',
+    grain: true,
+    isLightCard: true,
+  },
+  {
+    id: 'sunset-peach',
+    name: 'Sunset Aura',
+    tagline: 'Warm blush coral, golden apricot, and soft rose frosted glass.',
+    bgType: 'gradient',
+    bgPrimary: '#fda4af', // Coral rose
+    bgSecondary: '#fcd34d', // Warm apricot
+    bgTertiary: '#f43f5e',
+    accentColor: '#be123c', // Crimson rose
+    textColor: '#0f172a',
+    subtextColor: '#475569',
+    cardBg: 'rgba(255, 255, 255, 0.88)',
+    cardBorder: 'rgba(255, 255, 255, 0.7)',
+    fontFamily: 'sans',
+    grain: true,
+    isLightCard: true,
+  },
+  {
+    id: 'deep-indigo',
+    name: 'Tokyo Indigo',
+    tagline: 'Deep midnight sapphire with luminous violet frosted glass.',
+    bgType: 'gradient',
+    bgPrimary: '#090d16',
+    bgSecondary: '#1e1b4b',
+    accentColor: '#a78bfa', // Luminous violet
+    textColor: '#f8fafc',
+    subtextColor: '#cbd5e1',
+    cardBg: 'rgba(30, 27, 75, 0.75)',
+    cardBorder: 'rgba(167, 139, 250, 0.25)',
+    fontFamily: 'sans',
+    grain: true,
+    isLightCard: false,
+  },
+  {
     id: 'obsidian',
-    name: 'Obsidian Swiss',
-    tagline: 'Minimalist Swiss typography on deep obsidian titanium.',
+    name: 'Obsidian Minimal',
+    tagline: 'Minimalist titanium charcoal for dark mode purists.',
     bgType: 'solid',
     bgPrimary: '#09090b',
     bgSecondary: '#141417',
     accentColor: '#10b981', // Signal Emerald
     textColor: '#ffffff',
     subtextColor: '#a1a1aa',
-    cardBg: 'rgba(24, 24, 27, 0.75)',
+    cardBg: 'rgba(24, 24, 27, 0.82)',
     cardBorder: 'rgba(255, 255, 255, 0.12)',
-    fontFamily: 'mono',
-    grain: true,
-  },
-  {
-    id: 'terminal',
-    name: 'Cyber Telemetry',
-    tagline: 'Retro-futuristic CRT telemetry with phosphor matrix glow.',
-    bgType: 'procedural',
-    bgPrimary: '#030806',
-    bgSecondary: '#091811',
-    accentColor: '#22c55e', // Phosphor Green
-    textColor: '#86efac',
-    subtextColor: '#4ade80',
-    cardBg: 'rgba(5, 20, 12, 0.85)',
-    cardBorder: 'rgba(34, 197, 94, 0.35)',
-    fontFamily: 'mono',
-    grain: true,
-  },
-  {
-    id: 'aura',
-    name: 'Twilight Aura',
-    tagline: 'Deep velvet violet mesh glow with frosted glass cards.',
-    bgType: 'gradient',
-    bgPrimary: '#0d071c',
-    bgSecondary: '#241242',
-    accentColor: '#f59e0b', // Solar Amber
-    textColor: '#ffffff',
-    subtextColor: '#cbd5e1',
-    cardBg: 'rgba(255, 255, 255, 0.08)',
-    cardBorder: 'rgba(255, 255, 255, 0.18)',
     fontFamily: 'sans',
     grain: true,
-  },
-  {
-    id: 'bauhaus',
-    name: 'Bauhaus Construct',
-    tagline: 'High-contrast geometric constructivism with bold typography.',
-    bgType: 'solid',
-    bgPrimary: '#0e0e11',
-    bgSecondary: '#1c1c24',
-    accentColor: '#ef4444', // Bauhaus Crimson
-    textColor: '#fafafa',
-    subtextColor: '#94a3b8',
-    cardBg: 'rgba(28, 28, 36, 0.85)',
-    cardBorder: 'rgba(239, 68, 68, 0.3)',
-    fontFamily: 'sans',
-    grain: false,
-  },
-  {
-    id: 'zen',
-    name: 'Zen Sanctuary',
-    tagline: 'Muted moss stone, calming negative space, and quiet focus.',
-    bgType: 'solid',
-    bgPrimary: '#111714',
-    bgSecondary: '#19241e',
-    accentColor: '#34d399', // Mint Jade
-    textColor: '#f0fdf4',
-    subtextColor: '#9ca3af',
-    cardBg: 'rgba(25, 36, 30, 0.75)',
-    cardBorder: 'rgba(52, 211, 153, 0.15)',
-    fontFamily: 'serif',
-    grain: true,
+    isLightCard: false,
   },
   {
     id: 'custom',
     name: 'Custom Darkroom',
-    tagline: 'Upload any photo or Gemini wallpaper with legibility tinting.',
+    tagline: 'Upload your own wallpaper with legibility tinting and blur.',
     bgType: 'image',
     bgPrimary: '#000000',
     bgSecondary: '#111111',
@@ -90,6 +97,7 @@ export const THEME_PRESETS: ThemeConfig[] = [
     cardBorder: 'rgba(255, 255, 255, 0.2)',
     fontFamily: 'sans',
     grain: true,
+    isLightCard: false,
     imageBlur: 4,
     imageDim: 45,
   },

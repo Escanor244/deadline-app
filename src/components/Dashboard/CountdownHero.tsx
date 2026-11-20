@@ -51,8 +51,15 @@ export const CountdownHero: React.FC<CountdownHeroProps> = ({
         <div className="space-y-1.5">
           <div className="flex flex-wrap items-center gap-2">
             <span className="px-2.5 py-0.5 rounded-full text-[10px] font-mono font-bold uppercase tracking-wider bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">
-              {deadline.category}
+              {deadline.briefing
+                ? `${deadline.briefing.greetingPrefix || 'Good morning'}, ${deadline.briefing.userName || 'Alex'}`
+                : deadline.category}
             </span>
+            {deadline.briefing && (
+              <span className="text-xs text-zinc-400 font-medium">
+                ☁ {deadline.briefing.weather.temperature}, {deadline.briefing.weather.condition} • {deadline.briefing.events.length} events, {deadline.briefing.tasks.length} tasks today
+              </span>
+            )}
             <span className="text-xs text-zinc-500 font-mono">
               Due: {formattedDate}
             </span>

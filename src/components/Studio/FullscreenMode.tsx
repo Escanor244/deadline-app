@@ -69,7 +69,15 @@ export const FullscreenMode: React.FC<FullscreenModeProps> = ({
         className="absolute inset-0 z-0"
         style={{
           background:
-            theme.id === 'aura'
+            theme.id === 'citron-mint'
+              ? 'linear-gradient(135deg, #cff674 0%, #9cf1a5 38%, #7bf0d5 72%, #6ee7b7 100%)'
+              : theme.id === 'sunset-peach'
+              ? 'linear-gradient(135deg, #fda4af 0%, #fcd34d 50%, #f43f5e 100%)'
+              : theme.id === 'nordic-paper'
+              ? 'linear-gradient(180deg, #f8f6f0 0%, #e9e4d8 100%)'
+              : theme.id === 'deep-indigo'
+              ? 'linear-gradient(135deg, #090d16 0%, #1e1b4b 60%, #171131 100%)'
+              : theme.id === 'aura'
               ? `radial-gradient(circle at 50% 30%, rgba(139, 92, 246, 0.4) 0%, rgba(13, 7, 28, 0) 70%), ${theme.bgPrimary}`
               : theme.id === 'terminal'
               ? `linear-gradient(to bottom, #030806, #091811)`

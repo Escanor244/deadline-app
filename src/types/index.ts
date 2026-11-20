@@ -12,6 +12,33 @@ export interface Milestone {
   estimatedHours: number;
 }
 
+export interface ScheduleEvent {
+  id: string;
+  time: string; // e.g. "9:30 AM"
+  title: string; // e.g. "Team standup"
+}
+
+export interface DailyTask {
+  id: string;
+  title: string; // e.g. "Send report"
+  completed: boolean;
+}
+
+export interface WeatherInfo {
+  temperature: string; // e.g. "72°"
+  condition: string; // e.g. "partly cloudy"
+  location: string; // e.g. "Greenpoint, Brooklyn"
+  forecastNote: string; // e.g. "Light rain likely after 6PM, bring an umbrella"
+}
+
+export interface BriefingProfile {
+  userName: string; // e.g. "Alex"
+  greetingPrefix?: string; // e.g. "Good morning"
+  weather: WeatherInfo;
+  events: ScheduleEvent[];
+  tasks: DailyTask[];
+}
+
 export interface Deadline {
   id: string;
   title: string;
@@ -21,9 +48,20 @@ export interface Deadline {
   description: string;
   mantra: string;
   milestones: Milestone[];
+  briefing?: BriefingProfile;
 }
 
-export type ThemeId = 'obsidian' | 'terminal' | 'aura' | 'bauhaus' | 'zen' | 'custom';
+export type ThemeId =
+  | 'citron-mint'
+  | 'nordic-paper'
+  | 'sunset-peach'
+  | 'deep-indigo'
+  | 'obsidian'
+  | 'terminal'
+  | 'aura'
+  | 'bauhaus'
+  | 'zen'
+  | 'custom';
 
 export interface ThemeConfig {
   id: ThemeId;
@@ -32,6 +70,7 @@ export interface ThemeConfig {
   bgType: 'solid' | 'gradient' | 'procedural' | 'image';
   bgPrimary: string;
   bgSecondary: string;
+  bgTertiary?: string;
   accentColor: string;
   textColor: string;
   subtextColor: string;
@@ -39,6 +78,7 @@ export interface ThemeConfig {
   cardBorder: string;
   fontFamily: 'mono' | 'sans' | 'serif';
   grain: boolean;
+  isLightCard?: boolean;
   customImageUri?: string;
   imageBlur?: number; // 0 to 20
   imageDim?: number;  // 0 to 100
@@ -54,6 +94,10 @@ export interface WidgetSettings {
   showProgressRing: boolean;
   showMantra: boolean;
   showDeviceDecorations: boolean; // Dynamic Island / Status Bar
+  showGreeting: boolean;
+  showWeather: boolean;
+  showEvents: boolean;
+  showTasks: boolean;
 }
 
 export interface TimeRemaining {

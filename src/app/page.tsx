@@ -32,6 +32,7 @@ import { FullscreenMode } from '@/components/Studio/FullscreenMode';
 import { DeadlineSetup } from '@/components/Planner/DeadlineSetup';
 import { MilestoneList } from '@/components/Planner/MilestoneList';
 import { GeminiCoPilot } from '@/components/Planner/GeminiCoPilot';
+import { DailyBriefingEditor } from '@/components/Planner/DailyBriefingEditor';
 import { CreateGoalModal } from '@/components/Planner/CreateGoalModal';
 import { CalendarSync } from '@/components/Export/CalendarSync';
 import { CloudDataManager } from '@/components/Storage/CloudDataManager';
@@ -259,6 +260,7 @@ export default function Home() {
         {/* TAB 1: MILESTONES & ROADMAP (Default Main Workspace) */}
         {activeTab === 'planner' && (
           <div className="space-y-8">
+            <DailyBriefingEditor deadline={deadline} setDeadline={setDeadline} />
             <DeadlineSetup
               deadline={deadline}
               setDeadline={setDeadline}

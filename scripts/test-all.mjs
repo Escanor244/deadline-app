@@ -205,7 +205,7 @@ async function runTests() {
 
     // Test Dynamic Edge Wallpaper Endpoint (/api/wallpaper)
     console.log('Testing Edge Dynamic Wallpaper PNG Generator...');
-    const wallpaperUrl = `${BASE_URL}/api/wallpaper?title=${encodeURIComponent('Deploy To Vercel')}&targetDate=${encodeURIComponent(futureIso)}&theme=amber`;
+    const wallpaperUrl = `${BASE_URL}/api/wallpaper?title=${encodeURIComponent('Deploy To Vercel')}&targetDate=${encodeURIComponent(futureIso)}&theme=citron-mint&userName=Alex`;
     const wpRes = await fetch(wallpaperUrl);
     assert(wpRes.status === 200, 'GET /api/wallpaper returns HTTP 200 OK');
     const contentType = wpRes.headers.get('content-type') || '';

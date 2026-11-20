@@ -20,6 +20,25 @@ export function createNewDeadline(
     description: 'High-priority milestone project. Ship on schedule with zero compromises.',
     mantra: 'Focus on the finish line.',
     milestones: [],
+    briefing: {
+      userName: 'Alex',
+      greetingPrefix: 'Good morning',
+      weather: {
+        temperature: '72°',
+        condition: 'partly cloudy',
+        location: 'Greenpoint, Brooklyn',
+        forecastNote: 'Light rain likely after 6PM, bring an umbrella',
+      },
+      events: [
+        { id: 'ev-1', time: '9:30 AM', title: 'Team standup' },
+        { id: 'ev-2', time: '1:00 PM', title: 'Lunch with Priya' },
+        { id: 'ev-3', time: '4:00 PM', title: 'Dentist (20 min drive)' },
+      ],
+      tasks: [
+        { id: 'tk-1', title: 'Send report', completed: false },
+        { id: 'tk-2', title: 'Renew car registration', completed: false },
+      ],
+    },
   };
 
   newDeadline.milestones = generateBackwardMilestones(title, newDeadline.targetDate);

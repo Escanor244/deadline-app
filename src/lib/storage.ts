@@ -20,6 +20,10 @@ export const DEFAULT_WIDGETS: WidgetSettings = {
   showProgressRing: true,
   showMantra: true,
   showDeviceDecorations: true,
+  showGreeting: true,
+  showWeather: true,
+  showEvents: true,
+  showTasks: true,
 };
 
 export function loadAllDeadlines(): Deadline[] {

@@ -85,6 +85,24 @@ export const CreateGoalModal: React.FC<CreateGoalModalProps> = ({
         'Ship on schedule with precision and uncompromising standards.',
       mantra: mantra.trim() || 'Focus on the finish line.',
       milestones: [],
+      briefing: {
+        userName: 'Alex',
+        greetingPrefix: 'Good morning',
+        weather: {
+          temperature: '72°',
+          condition: 'partly cloudy',
+          location: 'Greenpoint, Brooklyn',
+          forecastNote: 'Light rain likely after 6PM, bring an umbrella',
+        },
+        events: [
+          { id: 'ev-1', time: '9:30 AM', title: 'Team standup' },
+          { id: 'ev-2', time: '1:00 PM', title: 'Lunch with Priya' },
+        ],
+        tasks: [
+          { id: 'tk-1', title: 'Send report', completed: false },
+          { id: 'tk-2', title: 'Renew car registration', completed: false },
+        ],
+      },
     };
 
     if (autoMilestones) {

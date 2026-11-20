@@ -22,11 +22,21 @@ export const LiveWallpaperGuide: React.FC<LiveWallpaperGuideProps> = ({
   if (!isOpen) return null;
 
   const origin = typeof window !== 'undefined' ? window.location.origin : 'https://your-project.vercel.app';
+  const userName = deadline.briefing?.userName || 'Alex';
+  const weather = deadline.briefing?.weather;
   const dynamicUrl = `${origin}/api/wallpaper?title=${encodeURIComponent(
     deadline.title
-  )}&targetDate=${encodeURIComponent(deadline.targetDate)}&mantra=${encodeURIComponent(
-    deadline.mantra
-  )}&theme=${encodeURIComponent(theme.id)}`;
+  )}&targetDate=${encodeURIComponent(deadline.targetDate)}&theme=${encodeURIComponent(
+    theme.id
+  )}&userName=${encodeURIComponent(userName)}&temp=${encodeURIComponent(
+    weather?.temperature || '72°'
+  )}&condition=${encodeURIComponent(
+    weather?.condition || 'partly cloudy'
+  )}&location=${encodeURIComponent(
+    weather?.location || 'Greenpoint, Brooklyn'
+  )}&note=${encodeURIComponent(
+    weather?.forecastNote || 'Light rain likely after 6PM, bring an umbrella'
+  )}`;
 
   const handleCopy = () => {
     navigator.clipboard.writeText(dynamicUrl);

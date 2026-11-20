@@ -27,15 +27,32 @@ export const DeviceMockup: React.FC<DeviceMockupProps> = ({
 }) => {
   const [showChassis, setShowChassis] = useState<boolean>(true);
 
+  const briefing = deadline.briefing || {
+    userName: 'Alex',
+    greetingPrefix: 'Good morning',
+    weather: {
+      temperature: '72°',
+      condition: 'partly cloudy',
+      location: 'Greenpoint, Brooklyn',
+      forecastNote: 'Light rain likely after 6PM, bring an umbrella',
+    },
+    events: [
+      { id: 'ev-1', time: '9:30 AM', title: 'Team standup' },
+      { id: 'ev-2', time: '1:00 PM', title: 'Lunch with Priya' },
+      { id: 'ev-3', time: '4:00 PM', title: 'Dentist (20 min drive)' },
+    ],
+    tasks: [
+      { id: 'tk-1', title: 'Send report', completed: false },
+      { id: 'tk-2', title: 'Renew car registration', completed: false },
+    ],
+  };
+
   const targetDateObj = new Date(deadline.targetDate);
-  const dateFormatted = targetDateObj.toLocaleDateString('en-US', {
+  const todayFormatted = new Date().toLocaleDateString('en-US', {
     weekday: 'long',
-    month: 'short',
+    month: 'long',
     day: 'numeric',
   });
-
-  const nextMilestone =
-    deadline.milestones.find((m) => !m.completed) || deadline.milestones[0];
 
   // Custom wallpaper background style
   const bgStyle: React.CSSProperties =
@@ -46,31 +63,29 @@ export const DeviceMockup: React.FC<DeviceMockupProps> = ({
           backgroundPosition: 'center',
           filter: theme.imageBlur ? `blur(${theme.imageBlur}px)` : undefined,
         }
+      : theme.id === 'citron-mint'
+      ? {
+          background: 'linear-gradient(135deg, #cff674 0%, #9cf1a5 38%, #7bf0d5 72%, #6ee7b7 100%)',
+        }
+      : theme.id === 'sunset-peach'
+      ? {
+          background: 'linear-gradient(135deg, #fda4af 0%, #fcd34d 50%, #f43f5e 100%)',
+        }
+      : theme.id === 'nordic-paper'
+      ? {
+          background: 'linear-gradient(180deg, #f8f6f0 0%, #e9e4d8 100%)',
+        }
+      : theme.id === 'deep-indigo'
+      ? {
+          background: 'linear-gradient(135deg, #090d16 0%, #1e1b4b 60%, #171131 100%)',
+        }
       : theme.id === 'aura'
       ? {
           background: `radial-gradient(circle at 50% 30%, rgba(139, 92, 246, 0.4) 0%, rgba(13, 7, 28, 0) 70%), radial-gradient(circle at 20% 70%, rgba(245, 158, 11, 0.25) 0%, rgba(13, 7, 28, 0) 60%), ${theme.bgPrimary}`,
         }
-      : theme.id === 'terminal'
-      ? {
-          background: `linear-gradient(to bottom, ${theme.bgPrimary}, ${theme.bgSecondary})`,
-        }
-      : theme.id === 'bauhaus'
-      ? {
-          background: `radial-gradient(circle at 85% 20%, rgba(239, 68, 68, 0.2) 0%, transparent 50%), ${theme.bgPrimary}`,
-        }
       : {
           background: `linear-gradient(to bottom, ${theme.bgPrimary}, ${theme.bgSecondary})`,
         };
-
-  const handleCycleFormat = () => {
-    if (!setWidgets) return;
-    const formats: Array<'dhms' | 'compact' | 'days_only'> = ['dhms', 'compact', 'days_only'];
-    const nextIdx = (formats.indexOf(widgets.countdownFormat) + 1) % formats.length;
-    setWidgets({
-      ...widgets,
-      countdownFormat: formats[nextIdx],
-    });
-  };
 
   // If desktop layout
   if (deviceType === 'desktop') {
@@ -79,118 +94,95 @@ export const DeviceMockup: React.FC<DeviceMockupProps> = ({
         {/* View Controls Toolbar */}
         <div className="w-full max-w-4xl flex items-center justify-between mb-3 px-1 text-xs">
           <span className="font-mono text-zinc-400">
-            DESKTOP // 16:9 MONITOR HUD
+            DESKTOP // 16:9 MONITOR DISPLAY
           </span>
           <button
             onClick={onEnterFullscreen}
             className="flex items-center space-x-1.5 px-3 py-1 rounded-lg bg-zinc-800 hover:bg-zinc-700 text-zinc-200 transition"
           >
             <Maximize2 className="w-3.5 h-3.5 text-emerald-400" />
-            <span>Launch Fullscreen Lock Screen</span>
+            <span>Launch Fullscreen Mode</span>
           </button>
         </div>
 
         <div className="relative mx-auto w-full max-w-4xl aspect-[16/10] rounded-2xl p-4 bg-zinc-900 border border-zinc-700 shadow-2xl flex flex-col justify-between">
           {/* Screen Content */}
           <div
-            className="relative w-full h-full rounded-xl overflow-hidden p-8 flex flex-col justify-between select-none"
+            className="relative w-full h-full rounded-xl overflow-hidden p-8 flex flex-col justify-center items-center select-none shadow-inner"
             style={bgStyle}
           >
             {theme.grain && (
               <div className="absolute inset-0 bg-grain opacity-25 pointer-events-none" />
             )}
 
-            {/* Top Bar */}
-            <div className="relative z-10 flex justify-between items-center text-xs font-mono text-zinc-400">
-              <span>KAIROS // MONITOR DISPLAY</span>
-              <div className="flex items-center space-x-4">
-                <span>{dateFormatted.toUpperCase()}</span>
-                <span className="text-white font-bold">{currentTimeStr}</span>
+            {/* Morning Briefing Card (Desktop Format) */}
+            <div
+              className="relative z-10 w-full max-w-2xl p-8 rounded-3xl shadow-2xl transition-all"
+              style={{
+                backgroundColor: theme.cardBg,
+                borderColor: theme.cardBorder,
+                borderWidth: '1.5px',
+                borderStyle: 'solid',
+                backdropFilter: 'blur(24px)',
+                color: theme.textColor,
+              }}
+            >
+              <div className="text-xs font-medium text-slate-500 mb-1">
+                {todayFormatted}
               </div>
-            </div>
-
-            {/* Center Hub */}
-            <div className="relative z-10 max-w-2xl mx-auto w-full p-8 rounded-2xl glass-panel text-center">
-              <span
-                className="text-xs font-mono font-bold tracking-widest uppercase"
-                style={{ color: theme.accentColor }}
-              >
-                // TARGET DEADLINE · {deadline.category}
-              </span>
-              <h2
-                className="text-2xl sm:text-3xl font-bold mt-1 tracking-tight"
-                style={{ color: theme.textColor }}
-              >
-                {deadline.title}
+              <h2 className="text-2xl font-bold tracking-tight">
+                {briefing.greetingPrefix || 'Good morning'}, {briefing.userName || 'Alex'}
               </h2>
 
-              {/* Countdown Grid */}
-              <div
-                onClick={handleCycleFormat}
-                className="grid grid-cols-4 gap-4 mt-6 cursor-pointer"
-                title="Click to change countdown format"
-              >
-                {[
-                  { label: 'DAYS', val: timeRemaining.days },
-                  { label: 'HOURS', val: timeRemaining.hours },
-                  { label: 'MINUTES', val: timeRemaining.minutes },
-                  { label: 'SECONDS', val: timeRemaining.seconds },
-                ].map((item, idx) => (
-                  <div
-                    key={idx}
-                    className="p-3 rounded-xl bg-black/40 border border-white/5 flex flex-col items-center hover:bg-black/60 transition"
-                  >
-                    <span
-                      className="text-3xl sm:text-4xl font-mono font-bold tabular-nums"
-                      style={{ color: theme.textColor }}
-                    >
-                      {String(item.val).padStart(2, '0')}
-                    </span>
-                    <span className="text-[10px] font-mono tracking-widest text-zinc-400 mt-1">
-                      {item.label}
-                    </span>
-                  </div>
-                ))}
+              <div className="mt-2 text-xs">
+                <span className="font-semibold">
+                  ☁  {briefing.weather.temperature}, {briefing.weather.condition} {briefing.weather.location}
+                </span>
+                <p className="text-slate-500 mt-0.5">{briefing.weather.forecastNote}</p>
               </div>
 
-              {/* Progress bar */}
-              {widgets.showProgressRing && (
-                <div className="w-full bg-zinc-800/80 rounded-full h-2 mt-6 overflow-hidden">
-                  <div
-                    className="h-full rounded-full transition-all duration-500"
-                    style={{
-                      width: `${Math.max(5, timeRemaining.formattedPercentage)}%`,
-                      backgroundColor: theme.accentColor,
-                    }}
-                  />
-                </div>
-              )}
-            </div>
+              <div className="my-4 border-b border-black/10 dark:border-white/10" />
 
-            {/* Bottom Bar */}
-            <div className="relative z-10 flex justify-between items-center text-xs">
-              {widgets.showMilestone && nextMilestone && (
-                <div className="flex items-center space-x-2">
-                  <span
-                    className="px-2 py-0.5 rounded font-mono text-[10px] font-bold"
-                    style={{
-                      backgroundColor: `${theme.accentColor}25`,
-                      color: theme.accentColor,
-                    }}
-                  >
-                    {nextMilestone.pacingLabel}
-                  </span>
-                  <span className="text-zinc-300 font-medium">
-                    {nextMilestone.title}
-                  </span>
+              <div className="grid grid-cols-2 gap-4 text-xs">
+                <div>
+                  <div className="font-bold mb-2">🗓  {briefing.events.length} events today</div>
+                  <div className="space-y-1 text-slate-700 dark:text-slate-300">
+                    {briefing.events.slice(0, 3).map((ev) => (
+                      <div key={ev.id} className="truncate">
+                        {ev.time} — {ev.title}
+                      </div>
+                    ))}
+                  </div>
                 </div>
-              )}
 
-              {widgets.showMantra && deadline.mantra && (
-                <span className="text-zinc-400 italic">
-                  "{deadline.mantra}"
+                <div>
+                  <div className="font-bold mb-2">📋  {briefing.tasks.length} tasks due today</div>
+                  <div className="space-y-1 text-slate-700 dark:text-slate-300">
+                    {briefing.tasks.slice(0, 3).map((tk) => (
+                      <div key={tk.id} className="truncate">
+                        {tk.title}
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              </div>
+
+              <div className="my-4 border-b border-black/10 dark:border-white/10" />
+
+              <div className="flex items-center justify-between text-xs">
+                <span className="font-bold text-emerald-600 dark:text-emerald-400">
+                  🎯 TARGET: {deadline.title.toUpperCase()}
                 </span>
-              )}
+                <span className="font-bold">
+                  {timeRemaining.days}d {timeRemaining.hours}h left
+                </span>
+              </div>
+              <div className="w-full bg-black/10 dark:bg-white/10 rounded-full h-1.5 mt-2 overflow-hidden">
+                <div
+                  className="h-full bg-emerald-500 rounded-full"
+                  style={{ width: `${Math.max(5, timeRemaining.formattedPercentage)}%` }}
+                />
+              </div>
             </div>
           </div>
 
@@ -210,23 +202,18 @@ export const DeviceMockup: React.FC<DeviceMockupProps> = ({
       <div className="w-full max-w-[360px] flex items-center justify-between mb-2 text-xs">
         <button
           onClick={() => setShowChassis(!showChassis)}
-          className="flex items-center space-x-1.5 px-2.5 py-1 rounded-lg bg-zinc-900 border border-zinc-800 text-zinc-400 hover:text-zinc-200 transition text-[11px]"
+          className="flex items-center space-x-1 text-zinc-400 hover:text-white transition"
         >
-          <Smartphone className="w-3 h-3 text-zinc-400" />
-          <span>{showChassis ? 'View Frameless Canvas' : 'Show Phone Bezel'}</span>
+          <Smartphone className="w-3.5 h-3.5" />
+          <span>{showChassis ? 'Hide Phone Frame' : 'Show Phone Frame'}</span>
         </button>
 
-        <button
-          onClick={onEnterFullscreen}
-          className="flex items-center space-x-1.5 px-2.5 py-1 rounded-lg bg-emerald-500/10 hover:bg-emerald-500/20 border border-emerald-500/30 text-emerald-300 transition text-[11px] font-medium"
-          title="Turn your current screen into a live lock screen"
-        >
-          <Maximize2 className="w-3 h-3" />
-          <span>Live Fullscreen</span>
-        </button>
+        <span className="font-mono text-[11px] text-zinc-500">
+          {isIphone ? 'Apple iOS 18' : 'Android'}
+        </span>
       </div>
 
-      {/* Screen Frame Container */}
+      {/* Phone Body */}
       <div
         className={`relative transition-all duration-300 ${
           showChassis
@@ -251,10 +238,10 @@ export const DeviceMockup: React.FC<DeviceMockupProps> = ({
 
           {/* Film Grain Texture */}
           {theme.grain && (
-            <div className="absolute inset-0 bg-grain opacity-30 pointer-events-none" />
+            <div className="absolute inset-0 bg-grain opacity-25 pointer-events-none" />
           )}
 
-          {/* Hardware Cutout: Dynamic Island or Punch Hole (Only if chassis is active) */}
+          {/* Hardware Cutout: Dynamic Island or Punch Hole */}
           {showChassis && widgets.showDeviceDecorations && (
             <div className="relative z-30 pt-3 flex justify-center">
               {isIphone ? (
@@ -275,226 +262,154 @@ export const DeviceMockup: React.FC<DeviceMockupProps> = ({
             {widgets.displayMode === 'standalone_hud' || widgets.showClock ? (
               <>
                 <p
-                  className="text-xs font-semibold tracking-wider uppercase drop-shadow"
-                  style={{ color: theme.subtextColor }}
+                  className="text-xs font-semibold tracking-wider drop-shadow"
+                  style={{ color: theme.isLightCard ? 'rgba(15, 23, 42, 0.7)' : theme.subtextColor }}
                 >
-                  {dateFormatted}
+                  {todayFormatted}
                 </p>
 
                 <h1
                   className="text-6xl sm:text-7xl font-bold tracking-tight mt-1 tabular-nums drop-shadow-md"
                   style={{
-                    color: theme.textColor,
-                    fontFamily:
-                      theme.fontFamily === 'mono'
-                        ? 'monospace'
-                        : 'Inter, system-ui, sans-serif',
+                    color: theme.isLightCard ? '#0f172a' : theme.textColor,
                   }}
                 >
                   {currentTimeStr}
                 </h1>
               </>
             ) : (
-              <div className="py-5 px-3 rounded-2xl border border-dashed border-white/10 bg-black/20 text-center">
-                <span className="text-[10px] font-mono text-zinc-500 uppercase tracking-widest block">
+              <div className="py-4 px-3 rounded-2xl border border-dashed border-black/10 dark:border-white/10 bg-white/20 dark:bg-black/20 text-center">
+                <span className="text-[10px] font-mono text-zinc-600 dark:text-zinc-400 uppercase tracking-widest block">
                   Native Phone Clock Area
                 </span>
-                <span className="text-[9px] text-zinc-600 block mt-0.5">
-                  (Safe zone for iOS / Android Lock Screen)
+                <span className="text-[9px] text-zinc-500 block mt-0.5">
+                  (Safe zone for iPhone / Android Lock Screen)
                 </span>
               </div>
             )}
           </div>
 
-          {/* Center Main Countdown Widget Card */}
-          <div
-            className={`relative z-20 px-4 transition-all ${
-              widgets.verticalPosition === 'lower_third'
-                ? 'mt-auto mb-6'
-                : 'my-auto'
-            }`}
-          >
+          {/* Center: The Morning Briefing Porcelain Glass Card */}
+          <div className="relative z-20 px-3.5 my-auto">
             <div
-              className="rounded-3xl p-5 shadow-xl transition-all"
+              className="rounded-[32px] p-5 shadow-2xl transition-all"
               style={{
                 backgroundColor: theme.cardBg,
                 borderColor: theme.cardBorder,
-                borderWidth: '1px',
+                borderWidth: '1.5px',
                 borderStyle: 'solid',
-                backdropFilter: 'blur(16px)',
+                backdropFilter: 'blur(24px)',
+                color: theme.textColor,
               }}
             >
-              {/* Category & Project Title */}
-              <div className="flex items-center justify-between">
-                <span
-                  className="text-[10px] font-mono font-bold uppercase tracking-wider px-2 py-0.5 rounded"
-                  style={{
-                    backgroundColor: `${theme.accentColor}25`,
-                    color: theme.accentColor,
-                  }}
-                >
-                  {deadline.category}
-                </span>
-                <span className="text-[10px] font-mono text-zinc-400">
-                  T-{timeRemaining.days}D LEFT
-                </span>
+              {/* Date */}
+              <div className="text-[11px] font-medium text-slate-500 dark:text-slate-400">
+                {todayFormatted}
               </div>
 
-              <h3
-                className="text-base font-bold mt-2 truncate"
-                style={{ color: theme.textColor }}
-              >
-                {deadline.title}
-              </h3>
+              {/* Greeting */}
+              <h2 className="text-xl sm:text-2xl font-extrabold tracking-tight mt-0.5">
+                {briefing.greetingPrefix || 'Good morning'}, {briefing.userName || 'Alex'}
+              </h2>
 
-              {/* Countdown Numbers (Click to Cycle Format) */}
-              {widgets.showCountdown && (
-                <div
-                  onClick={handleCycleFormat}
-                  className="mt-4 cursor-pointer"
-                  title="Click to cycle countdown format"
-                >
-                  {timeRemaining.isExpired ? (
-                    <div className="p-3 rounded-xl bg-amber-500/20 border border-amber-500/30 text-center">
-                      <span className="text-sm font-mono font-bold text-amber-300">
-                        ⚡ TARGET REACHED // FINISHED
-                      </span>
-                    </div>
-                  ) : widgets.countdownFormat === 'days_only' ? (
-                    <div className="p-4 rounded-xl bg-black/30 border border-white/5 flex flex-col items-center hover:bg-black/40 transition">
-                      <span
-                        className="text-4xl sm:text-5xl font-mono font-bold tabular-nums"
-                        style={{ color: theme.textColor }}
-                      >
-                        {timeRemaining.days}
-                      </span>
-                      <span
-                        className="text-xs font-mono tracking-widest uppercase mt-1"
-                        style={{ color: theme.subtextColor }}
-                      >
-                        DAYS REMAINING
-                      </span>
-                    </div>
-                  ) : widgets.countdownFormat === 'compact' ? (
-                    <div className="p-2.5 rounded-xl bg-black/30 border border-white/5 flex items-center justify-around font-mono text-sm font-bold hover:bg-black/40 transition">
-                      <span style={{ color: theme.textColor }}>
-                        {String(timeRemaining.days).padStart(2, '0')}d
-                      </span>
-                      <span className="text-zinc-600">:</span>
-                      <span style={{ color: theme.textColor }}>
-                        {String(timeRemaining.hours).padStart(2, '0')}h
-                      </span>
-                      <span className="text-zinc-600">:</span>
-                      <span style={{ color: theme.textColor }}>
-                        {String(timeRemaining.minutes).padStart(2, '0')}m
-                      </span>
-                      <span className="text-zinc-600">:</span>
-                      <span style={{ color: theme.accentColor }}>
-                        {String(timeRemaining.seconds).padStart(2, '0')}s
-                      </span>
-                    </div>
-                  ) : (
-                    <div className="grid grid-cols-4 gap-2">
-                      {[
-                        { label: 'DAYS', val: timeRemaining.days },
-                        { label: 'HRS', val: timeRemaining.hours },
-                        { label: 'MIN', val: timeRemaining.minutes },
-                        { label: 'SEC', val: timeRemaining.seconds },
-                      ].map((unit, idx) => (
-                        <div
-                          key={idx}
-                          className="p-2 rounded-xl bg-black/30 border border-white/5 flex flex-col items-center hover:bg-black/40 transition"
-                        >
-                          <span
-                            className="text-xl sm:text-2xl font-mono font-bold tabular-nums"
-                            style={{ color: theme.textColor }}
-                          >
-                            {String(unit.val).padStart(2, '0')}
-                          </span>
-                          <span
-                            className="text-[9px] font-mono font-medium tracking-wider"
-                            style={{ color: theme.subtextColor }}
-                          >
-                            {unit.label}
-                          </span>
-                        </div>
-                      ))}
-                    </div>
+              {/* Weather row */}
+              {widgets.showWeather !== false && (
+                <div className="mt-2 text-xs">
+                  <div className="font-semibold flex items-center space-x-1">
+                    <span>☁</span>
+                    <span>
+                      {briefing.weather.temperature}, {briefing.weather.condition} {briefing.weather.location}
+                    </span>
+                  </div>
+                  {briefing.weather.forecastNote && (
+                    <p className="text-[11px] text-slate-500 dark:text-slate-400 mt-0.5 leading-snug">
+                      {briefing.weather.forecastNote}
+                    </p>
                   )}
                 </div>
               )}
 
-              {/* Visual Deadline Progress Bar */}
-              {widgets.showProgressRing && (
-                <div className="mt-4">
-                  <div className="flex justify-between text-[10px] font-mono text-zinc-400 mb-1">
-                    <span>PROGRESS PACE</span>
-                    <span className="font-bold" style={{ color: theme.accentColor }}>
-                      {timeRemaining.formattedPercentage}%
-                    </span>
+              {/* Divider */}
+              <div className="my-3 border-b border-black/10 dark:border-white/10" />
+
+              {/* Dual Column Life Grid */}
+              <div className="grid grid-cols-2 gap-3 text-[11px]">
+                {/* Events Column */}
+                <div>
+                  <div className="font-bold flex items-center space-x-1 mb-1.5">
+                    <span>🗓</span>
+                    <span>{briefing.events.length} events today</span>
                   </div>
-                  <div className="w-full bg-black/40 rounded-full h-1.5 overflow-hidden">
-                    <div
-                      className="h-full rounded-full transition-all duration-300"
-                      style={{
-                        width: `${Math.max(4, timeRemaining.formattedPercentage)}%`,
-                        backgroundColor: theme.accentColor,
-                      }}
-                    />
+                  <div className="space-y-1 text-slate-700 dark:text-slate-300 text-[10px]">
+                    {briefing.events.slice(0, 3).map((ev) => (
+                      <div key={ev.id} className="truncate">
+                        <span className="font-medium text-slate-900 dark:text-slate-100">{ev.time}</span> — {ev.title}
+                      </div>
+                    ))}
                   </div>
                 </div>
-              )}
-            </div>
 
-            {/* Active Milestone Card */}
-            {widgets.showMilestone && nextMilestone && (
-              <div
-                className="mt-3 rounded-2xl p-3.5 shadow-lg flex items-center space-x-3 transition-all"
-                style={{
-                  backgroundColor: theme.cardBg,
-                  borderColor: theme.cardBorder,
-                  borderWidth: '1px',
-                  borderStyle: 'solid',
-                  backdropFilter: 'blur(16px)',
-                }}
-              >
-                <div
-                  className="w-2 h-8 rounded-full flex-shrink-0"
-                  style={{ backgroundColor: theme.accentColor }}
-                />
-                <div className="min-w-0 flex-1">
-                  <div className="flex items-center space-x-1.5">
-                    <span
-                      className="text-[9px] font-mono font-bold tracking-tight uppercase"
-                      style={{ color: theme.accentColor }}
-                    >
-                      {nextMilestone.pacingLabel}
-                    </span>
-                    <span className="text-[9px] text-zinc-400">· NEXT SPRINT</span>
+                {/* Tasks Column */}
+                <div>
+                  <div className="font-bold flex items-center space-x-1 mb-1.5">
+                    <span>📋</span>
+                    <span>{briefing.tasks.length} tasks due today</span>
                   </div>
-                  <p
-                    className="text-xs font-semibold truncate mt-0.5"
-                    style={{ color: theme.textColor }}
-                  >
-                    {nextMilestone.title}
-                  </p>
+                  <div className="space-y-1 text-slate-700 dark:text-slate-300 text-[10px]">
+                    {briefing.tasks.slice(0, 3).map((tk) => (
+                      <div key={tk.id} className="truncate flex items-center space-x-1">
+                        <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 flex-shrink-0" />
+                        <span className={tk.completed ? 'line-through text-slate-400' : ''}>
+                          {tk.title}
+                        </span>
+                      </div>
+                    ))}
+                  </div>
                 </div>
               </div>
-            )}
+
+              {/* Divider */}
+              <div className="my-3 border-b border-black/10 dark:border-white/10" />
+
+              {/* Target Deadline Footer */}
+              <div>
+                <div className="flex items-center justify-between text-[11px]">
+                  <span
+                    className="font-bold tracking-tight uppercase"
+                    style={{ color: theme.accentColor }}
+                  >
+                    🎯 TARGET: {deadline.title}
+                  </span>
+                  <span className="font-bold tabular-nums">
+                    {timeRemaining.days}d {timeRemaining.hours}h left
+                  </span>
+                </div>
+
+                <div className="w-full bg-black/10 dark:bg-white/10 rounded-full h-1.5 mt-1.5 overflow-hidden">
+                  <div
+                    className="h-full rounded-full transition-all duration-300"
+                    style={{
+                      width: `${Math.max(4, timeRemaining.formattedPercentage)}%`,
+                      backgroundColor: theme.accentColor,
+                    }}
+                  />
+                </div>
+              </div>
+            </div>
           </div>
 
-          {/* Bottom Area: Mantra */}
-          <div className="relative z-20 pb-7 px-8 flex flex-col items-center">
+          {/* Bottom Area: Lock Screen Actions */}
+          <div className="relative z-20 pb-6 px-8 flex flex-col items-center">
             {widgets.showMantra && deadline.mantra && (
               <p
-                className="text-xs text-center italic mb-4 max-w-[260px] line-clamp-2"
-                style={{ color: theme.subtextColor }}
+                className="text-xs text-center italic mb-3 max-w-[260px] line-clamp-1 drop-shadow"
+                style={{ color: theme.isLightCard ? 'rgba(15, 23, 42, 0.7)' : theme.subtextColor }}
               >
                 "{deadline.mantra}"
               </p>
             )}
 
-            {/* iOS Action Buttons (Only when chassis is shown) */}
+            {/* iOS Action Buttons */}
             {showChassis && widgets.showDeviceDecorations && (
               <div className="w-full flex items-center justify-between px-2">
                 <div className="w-10 h-10 rounded-full bg-black/40 backdrop-blur-md border border-white/10 flex items-center justify-center text-white/80 shadow">

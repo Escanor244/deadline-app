@@ -7,30 +7,77 @@
     "createdAt": "2026-11-20T00:00:00.000Z",
     "description": "Ship production-ready application with zero regressions and complete documentation.",
     "mantra": "Focus on the finish line.",
+    "briefing": {
+      "userName": "Alex",
+      "greetingPrefix": "Good morning",
+      "weather": {
+        "temperature": "72°",
+        "condition": "partly cloudy",
+        "location": "Greenpoint, Brooklyn",
+        "forecastNote": "Light rain likely after 6PM, bring an umbrella"
+      },
+      "events": [
+        {
+          "id": "ev-1",
+          "time": "9:30 AM",
+          "title": "Team standup"
+        },
+        {
+          "id": "ev-2",
+          "time": "1:00 PM",
+          "title": "Lunch with Priya"
+        },
+        {
+          "id": "ev-3",
+          "time": "4:00 PM",
+          "title": "Dentist (20 min drive)"
+        }
+      ],
+      "tasks": [
+        {
+          "id": "tk-1",
+          "title": "Send report",
+          "completed": false
+        },
+        {
+          "id": "tk-2",
+          "title": "Renew car registration",
+          "completed": false
+        }
+      ]
+    },
     "milestones": [
       {
         "id": "ms-starter-1",
-        "title": "Production Launch V1 Phase 1: Architecture & Data Layer",
+        "title": "Phase 1: Architecture & Data Layer",
         "dueDate": "2026-11-26T00:00:00.000Z",
-        "completed": true
+        "completed": true,
+        "pacingLabel": "Phase 1 · T-14d",
+        "estimatedHours": 8
       },
       {
         "id": "ms-starter-2",
-        "title": "Production Launch V1 Phase 2: Core Feature Implementation",
+        "title": "Phase 2: Core Feature Implementation",
         "dueDate": "2026-12-04T00:00:00.000Z",
-        "completed": false
+        "completed": false,
+        "pacingLabel": "Phase 2 · T-8d",
+        "estimatedHours": 16
       },
       {
         "id": "ms-starter-3",
-        "title": "Production Launch V1 Phase 3: Quality Audit & Performance",
+        "title": "Phase 3: Quality Audit & Performance",
         "dueDate": "2026-12-11T00:00:00.000Z",
-        "completed": false
+        "completed": false,
+        "pacingLabel": "Phase 3 · T-4d",
+        "estimatedHours": 12
       },
       {
         "id": "ms-starter-4",
-        "title": "Production Launch V1 Phase 4: Final Staging & Deploy",
+        "title": "Phase 4: Final Staging & Deploy",
         "dueDate": "2026-12-14T00:00:00.000Z",
-        "completed": false
+        "completed": false,
+        "pacingLabel": "Phase 4 · T-24h",
+        "estimatedHours": 4
       }
     ]
   }
